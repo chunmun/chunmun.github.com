@@ -3,10 +3,10 @@ var GameEngineStates = {PAUSED:  0,
                         LOST:    2,
                         WON:     4};
 
-var MAX_ZOMBIE_COUNT = 5;
-var MAX_CIVILIAN_COUNT = 100;
-var MAX_SOLDIER_COUNT = 3;
-var GAME_DEFAULT_NUMBER_ZOMBIES = 20;
+var MAX_ZOMBIE_COUNT = 0;
+var MAX_CIVILIAN_COUNT = 0;
+var MAX_SOLDIER_COUNT = 0;
+var GAME_DEFAULT_NUMBER_ZOMBIES = 0;
 
 var DEBUG_SHOW_FRAMERATE = true;
 
@@ -60,9 +60,6 @@ GameEngine.prototype.init = function(canvas){
     //document.onmousemove = this.canvasMouseMove.bind(this);
     canvas.onmousedown = this.canvasMouseDown.bind(this);
     canvas.onmousemove = this.canvasMouseMove.bind(this);
-    
-    count_zombies_lbl.style.color = ZOMBIE_COLOR;
-    count_civilians_lbl.style.color = CIVILIAN_COLOR;
 };
 
 
@@ -105,10 +102,6 @@ GameEngine.prototype.newGame = function(){
     this.clearWorld();
 
     this.gameState = this.gamePaused ? GameEngineStates.PAUSED : GameEngineStates.RUNNING;
-    this.cityMap = MAP_GENERATORS[MAP_SELECTED_GENERATOR]();
-
-    this.__populateMapWithCivilians();
-    this.__populateMapWithSoldiers();
 };
 
 
@@ -698,9 +691,6 @@ GameEngine.prototype.handlePlayerInput = function(){
     // Do stuff in the game using the functions
     // like isKeyPressed
     
-    this.gameSpeed = gameSpeedSlider.value;
-    gameSpeedLabel.innerHTML = this.gameSpeed;
-    
     if(this.currentInfluencer){
         this.currentInfluencer.x = this.mouseX;
         this.currentInfluencer.y = this.mouseY;
@@ -816,12 +806,6 @@ GameEngine.prototype.__updateFocusComboBox = function(){
 
 
 GameEngine.prototype.updateUI = function(){
-    // Update numbers of Zombies, Civilians, and Total
-    var nzombies = this.zombies.filter(function(x){return x;}).length;
-    var ncivs = this.civilians.filter(function(x){return x;}).length;
-    count_zombies_lbl.innerHTML = nzombies;
-    count_civilians_lbl.innerHTML = ncivs;
-    count_total_lbl.innerHTML = nzombies + ncivs;
 }
 
 
@@ -897,7 +881,7 @@ GameEngine.prototype.render = function(ctx){
     // Fill Background, and CityMap/Roads
     ctx.fillStyle = "#AAAAAA";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.cityMap.render(ctx);
+    //this.cityMap.render(ctx);
 
     // Draw Influencer *under* units
     this.__renderInfluencersUnder(ctx);
