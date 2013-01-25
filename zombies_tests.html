@@ -1,0 +1,349 @@
+
+<html>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>JS-Zombies Unit Test (Main Page)</title>
+        <link rel="stylesheet" href="qunit/qunit.css" />
+        <script src="Geometry.js"></script>
+        <script src="GameEngine.js"></script>
+        <script src="qunit/qunit.js"></script>
+        <script>
+        function isClose(f1, f2){
+            return Math.abs(f1 - f2) < 0.0001;
+        }
+
+        function assertSamePoint(p1, p2){
+            ok(isClose(p1[0], p2[0]));
+            ok(isClose(p1[1], p2[1]));
+        }
+        
+        //test("Sample Test", function() {
+        //    equal("Some Value", // Calculated
+        //         "Some Value");  // Expected 
+        //});
+        
+        
+        module("Geometry");
+        test("Testing Geometry.rotatePoint", function() {
+            // Just some trivial test cases 
+            // for now.
+            // TODO: Add more test cases.
+
+            var p = [1, 0];
+            var q = [0, 1];
+            var res = Geometry.rotatePoint(p, -Math.PI/2);
+            assertSamePoint(res, q);
+        });
+        
+        
+        
+        test("Testing Geometry.translatePoint", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+
+            var p = [1, 1];
+            var q = [2, 2];
+            var res = Geometry.translatePoint(p, 1, 1);
+            assertSamePoint(res, q);
+        });
+        
+        
+        
+        test("Testing Geometry.ccw", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+            
+            var p0 = [0, 0];
+            var p1 = [1, 0];
+            var p2 = [2, 1];
+            var p3 = [2, -1];
+
+            ok(Geometry.ccw(p0, p1, p2) > 0);
+            ok(Geometry.ccw(p0, p1, p3) < 0);
+        });
+        
+        
+        
+        test("Testing Geometry.midpoint", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+
+            var p0 = [0, 0];
+            var p1 = [1, 1];
+            var p2 = [2, 2];
+
+            var res = Geometry.midpoint([p0, p2]);
+            assertSamePoint(res, p1);
+        });
+        
+        
+        
+        test("Testing Geometry.linesIntersect", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+
+            var p0 = [0, 0];
+            var p1 = [0, 1];
+            var p2 = [1, 1];
+            var p3 = [1, 0];
+
+            ok(Geometry.linesIntersect([p0, p2], [p1, p3]));
+            ok(!Geometry.linesIntersect([p0, p1], [p2, p3]));
+        });
+        
+        
+        
+        test("More Testing of Geometry.linesIntersect", function() {
+            // Copy-Paste from a Misc. GameUnit Collision test below.
+
+            var l1 = [[154, 116], [146, 116]];
+            var l2 = [[560, 116], [552, 116]];
+            var la = [[0, 0], [1, 0]];
+            var lb = [[2, 0], [3, 0]];
+            
+            var poly3 = [[154.13372941710045, 116],
+                         [146.13372941710045, 116],
+                         [146.13372941710045, 124],
+                         [154.13372941710045, 124]];
+            var poly3L0 = [poly3[0], poly3[1]];
+            var poly3L2 = [poly3[2], poly3[3]];
+            
+            var poly4 = [[560.228316384145, 116],
+                         [552.228316384145, 116],
+                         [552.228316384145, 124],
+                         [560.228316384145, 124]];
+            var poly4L0 = [poly4[0], poly4[1]];
+            var poly4L2 = [poly4[2], poly4[3]];
+
+            
+            ok(!Geometry.linePolygonIntersect(la, lb), "simple lines on the same line."); // fails
+            ok(!Geometry.linePolygonIntersect(l1, l2), "~~poly3->L0 x ~~poly4->L0"); // fails
+            ok(!Geometry.linePolygonIntersect(poly3L0, poly4L0), "poly3->L0 x poly4->L0"); // fails
+            ok(!Geometry.linePolygonIntersect(poly3L2, poly4L2), "poly3->L2 x poly4->L2"); // fails
+        });
+        
+        
+        
+        test("Testing Geometry.linePolygonIntersect", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+            var l1 = [[0, 0.5],
+                      [1, 0.5]];
+            var l2 = [[0, 1],
+                      [1, 2]];
+            var poly1 = [[0, 0],
+                         [1, 0],
+                         [0.5, 1]];
+
+            ok(Geometry.linePolygonIntersect(l1, poly1));
+            ok(!Geometry.linePolygonIntersect(l2, poly1));
+        });
+        
+        
+        
+        test("More Testing of Geometry.linePolygonIntersect", function(){
+            // Copy-Paste from a Misc. GameUnit Collision test below.
+            // In the game, poly3 and poly4 collided.
+            // (Clearly, they should not).
+            var poly3 = [[154.13372941710045, 116],
+                         [146.13372941710045, 116],
+                         [146.13372941710045, 124],
+                         [154.13372941710045, 124]];
+            
+            var poly4 = [[560.228316384145, 116],
+                         [552.228316384145, 116],
+                         [552.228316384145, 124],
+                         [560.228316384145, 124]];
+
+            
+            ok(!Geometry.linePolygonIntersect([poly3[0], poly3[1]], [poly4[0], poly4[1]]), "poly3->L0 x poly4->L0"); // fails
+            ok(!Geometry.linePolygonIntersect([poly3[0], poly3[1]], [poly4[1], poly4[2]]), "poly3->L0 x poly4->L1");
+            ok(!Geometry.linePolygonIntersect([poly3[0], poly3[1]], [poly4[2], poly4[3]]), "poly3->L0 x poly4->L2");
+            ok(!Geometry.linePolygonIntersect([poly3[0], poly3[1]], [poly4[3], poly4[0]]), "poly3->L0 x poly4->L3");
+            
+            // L x Poly
+            ok(!Geometry.linePolygonIntersect([poly3[0], poly3[1]], poly4), "poly3->L0 x poly4"); // fails
+            ok(!Geometry.linePolygonIntersect([poly3[1], poly3[2]], poly4), "poly3->L1 x poly4");
+            
+            
+            ok(!Geometry.linePolygonIntersect([poly3[2], poly3[3]], [poly4[0], poly4[1]]), "poly3->L2 x poly4->L0"); // fails
+            ok(!Geometry.linePolygonIntersect([poly3[2], poly3[3]], [poly4[1], poly4[2]]), "poly3->L2 x poly4->L1");
+            ok(!Geometry.linePolygonIntersect([poly3[2], poly3[3]], [poly4[2], poly4[3]]), "poly3->L2 x poly4->L2");
+            ok(!Geometry.linePolygonIntersect([poly3[2], poly3[3]], [poly4[3], poly4[0]]), "poly3->L2 x poly4->L3");
+            ok(!Geometry.linePolygonIntersect([poly3[2], poly3[3]], poly4), "poly3->L2 x poly4"); // fails
+            ok(!Geometry.linePolygonIntersect([poly3[3], poly3[0]], poly4), "poly3->L3 x poly4");
+        });
+        
+        
+        
+        test("Testing Geometry.polygonsIntersect", function() {
+            var poly1 = [[0, 0],
+                         [1, 0],
+                         [0.5, 1]];
+            var poly2 = poly1.map(function(p){ 
+                                      return Geometry.translatePoint(p, 0.5, 0.5);
+                                  },
+                                  poly1);
+            var poly3 = poly1.map(function(p){ 
+                                      return Geometry.translatePoint(p, 1, 1);
+                                  },
+                                  poly1);
+
+                                  
+            ok(Geometry.polygonsIntersect(poly1, poly2));
+            ok(!Geometry.polygonsIntersect(poly1, poly3));
+        });
+        
+        
+        
+        test("Testing Geometry.isLineSegmentOrthoganal", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+
+            ok(Geometry.isLineSegmentOrthoganal([[0, 5],
+                                                 [0, 8]]));
+            ok(!Geometry.isLineSegmentOrthoganal([[1, 1],
+                                                 [2, 2]]));
+        });
+        
+        
+        
+        test("Testing Geometry.boundingBoxForPolygon", function() {
+            var poly2 = [[0.5, 0],
+                         [1, 0.5],
+                         [0.5, 1],
+                         [0, 0.5]];
+            
+            var expected = [0, 0, 1, 1];
+            
+            var res = Geometry.boundingBoxForPolygon(poly2);
+            
+            for(var i = 0; i < 4; i++){
+                ok(isClose(res[i], expected[i]));
+            }
+        });
+        
+        
+        
+        test("Testing Geometry.pointInPolygon", function() {
+            // Some trivial test cases.
+            // TODO: Add more test cases.
+            
+            var poly1 = [[0, 0],
+                         [1, 0],
+                         [0.5, 1]];
+            var p1 = [0.5, 0.5];
+            var p2 = [1, 1];
+            
+            ok(Geometry.pointInPolygon(p1, poly1));
+            ok(!Geometry.pointInPolygon(p2, poly1));
+        });
+        
+        
+        
+        module("Misc.");
+        
+        
+        
+        test("Testing Unit Collision", function() {
+            // This screws up in the game.
+
+            // In the game, poly1 & poly2 collided.
+            var poly1 = [[146.66200626966128, 119.08255399196965],
+                         [138.66200626966128, 119.08255399196965],
+                         [138.66200626966128, 127.08255399196965],
+                         [146.66200626966128, 127.08255399196965]];
+            
+            var poly2 = [[154.13372941710045, 116],
+                         [146.13372941710045, 116],
+                         [146.13372941710045, 124],
+                         [154.13372941710045, 124]];
+            ok(Geometry.polygonsIntersect(poly1, poly2), "poly1 x poly2");
+    
+            // In the game, poly3 and poly4 collided.
+            // (Clearly, they should not).
+            var poly3 = [[154.13372941710045, 116],
+                         [146.13372941710045, 116],
+                         [146.13372941710045, 124],
+                         [154.13372941710045, 124]];
+            
+            var poly4 = [[560.228316384145, 116],
+                         [552.228316384145, 116],
+                         [552.228316384145, 124],
+                         [560.228316384145, 124]];
+            
+            ok(!Geometry.linePolygonIntersect([poly3[0], poly3[1]], poly4), "poly3->L0 x poly4");
+            ok(!Geometry.linePolygonIntersect([poly3[1], poly3[2]], poly4), "poly3->L1 x poly4");
+            ok(!Geometry.linePolygonIntersect([poly3[2], poly3[3]], poly4), "poly3->L2 x poly4");
+            ok(!Geometry.linePolygonIntersect([poly3[3], poly3[0]], poly4), "poly3->L3 x poly4");
+            
+            // Test Poly x Poly
+            ok(!Geometry.polygonsIntersect(poly3, poly4), "poly3 x poly4");
+            
+            // In the game, poly5 and poly6 collided.
+            var poly5 = [[154.13372941710045, 116],
+                         [146.13372941710045, 116],
+                         [146.13372941710045, 124],
+                         [154.13372941710045, 124]];
+            
+            var poly6 = [[430.57482207402626, 116],
+                         [422.57482207402626, 116],
+                         [422.57482207402626, 124],
+                         [430.57482207402626, 124]];
+            
+            ok(!Geometry.linePolygonIntersect([poly5[0], poly5[1]], poly6), "poly5->L0 x poly6");
+            ok(!Geometry.linePolygonIntersect([poly5[1], poly5[2]], poly6), "poly5->L1 x poly6");
+            ok(!Geometry.linePolygonIntersect([poly5[2], poly5[3]], poly6), "poly5->L2 x poly6");
+            ok(!Geometry.linePolygonIntersect([poly5[3], poly5[0]], poly6), "poly5->L3 x poly6");
+            
+            // Test Poly x Poly
+            ok(!Geometry.polygonsIntersect(poly5, poly6), "poly5 x poly6");
+        });
+        
+        
+        
+        test("Remove units from list", function(){
+            var arr = [1,2,3];
+            
+            removeFromList(1, arr);
+            ok(arr.length === 2, "Can remove primitive items from array");
+            removeFromList(2, arr);
+            ok(arr.length === 1, "Can remove primitive items from array");
+            
+            function Foo(x){ this.n = x; };
+            Foo.prototype.equals = function(){ return false; };
+            Foo.prototype.toString = function(){ return this.n; };
+            var a = new Foo('a');
+            var b = new Foo('b');
+            var c = new Foo('c');
+            var arr2 = [a, b, c];
+            
+            removeFromList(b, arr2);
+            ok(arr2.length === 2, "Can remove basic objects from array");
+            removeFromList(c, arr2);
+            console.log("Arr2'': " + arr2 + " (length " + arr2.length + ")");
+            ok(arr2.length === 1, "Can remove basic objects from array");
+            
+            function Bar(t){ this.x = t; }
+            Bar.prototype.toString = function(){ return this.x; };
+            Bar.prototype.equals = function(o){ return o instanceof Bar && o.x === this.x; };
+            var d = new Bar('d');
+            var e = new Bar('e');
+            var f = new Bar('f');
+            
+            var dd = new Bar('d');
+            var ee = new Bar('e');
+            var ff = new Bar('f');
+            
+            var arr3 = [d,e,f];
+            removeFromList(ee, arr3);
+            ok(arr3.length === 2, "Can remove basic objects from array using .equals");
+            removeFromList(ff, arr3);
+            ok(arr3.length === 1, "Can remove basic objects from array using .equals");
+        });
+        </script>
+    </head>
+    <body>
+        <!-- Div for results --> 
+        <div id="qunit"></div>
+    </body>
+</html>
