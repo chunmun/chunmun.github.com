@@ -4,6 +4,7 @@ Helper methods for Geometry and collision detection.
 NOTE: Points are represented as an array e.g. point at x, y is [x, y].
             Line segments are represented as an array of points, e.g. from A to B is [A, B].
             Polygon is an n-array of points.
+            Bezier Curve is an n-array of the control points. A cubic-degree bezier curve will have 4 points.
             
             Our coordinate system has x-positive to the right, and y-positive to the left.
             Angles in radians, with 0 at East, PI/2 at North.
@@ -191,6 +192,56 @@ var Geometry = (function(){
         // O(n)
         return (countLinePolygonIntersect(ray, poly) % 2) === 1;
     };
+    
+    
+    
+    function fact(n){ return n < 2 ? 1 : n * fact(n - 1) };
+    function C(n, r){ return fact(n) / (fact(r) * fact(n - r)); };
+    var evaluateCurve = function(curve, t){
+        /*
+          Returns a point by evaluating the curve at the parameter t.
+          (where t is between 0 and 1).
+        */
+    
+        var tx = 0;
+        var ty = 0;
+        
+        var n = curve.length;
+        for(var i = 0; i < n; i++){
+            // See explicit formula of Bezier curve.
+            var c = C(n, i) * Math.pow(1 - t, n - i) * Math.pow(t, i);
+            var tx += c * curve[i][0];
+            var ty += c * curve[i][1];
+        }
+        
+        return [tx, ty];
+    };
+    
+    
+    
+    function sub(pt1, pt2){ return [pt2[0] - pt1[0], pt2[1] - pt1[1]]; };
+    function magnitude(pt){ return Math.sqrt(pt[0]*pt[0] + pt[1]*pt[1]);
+    var estimateLength = function(curve, k){
+        /*
+          Estimate the length of the curve by sampling k + 1 points,
+           and summing the distance between these.
+        */
+        
+        var result = 0;
+        
+        var prevPt = evaluateCurve(curve, 0);
+        var currPt;
+        
+        for(var i = 1; i <= k; i++){
+            currPt = evaluateCurve(i / k);
+            
+            result += magnitude(sub(prevPt, currPt));
+            
+            prevPt = currPt;
+        }
+        
+        return result;
+    }
 
 
 
@@ -204,6 +255,8 @@ var Geometry = (function(){
     g.isLineSegmentOrthoganal = isLineSegmentOrthoganal;
     g.boundingBoxForPolygon = boundingBoxForPolygon;
     g.pointInPolygon = pointInPolygon;
+    g.evaluateCurve = evaluateCurve;
+    g.estimateLength = estimateLength;
 
     return g;
 }());
