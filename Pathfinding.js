@@ -12,10 +12,10 @@ function Waypoint(args){
 
 
 
-function Path(wpStart, wpEnd, curve){
-    this.wpStart = wpStart;
-    this.wpEnd = wpEnd;
-    this.curve = curve;
+function Path(args){
+    this.wpStart = args.wpStart;
+    this.wpEnd = args.wpEnd;
+    this.curve = args.curve;
     
     // Regsiter ourselfs with the waypoints.
     wpStart.adjacentPaths.push(this);
