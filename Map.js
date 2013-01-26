@@ -40,7 +40,7 @@ Map.prototype.renderMapPathData = function(ctx){
         // Sample points from the curve and render lines
         //  between them.
         context.moveTo(pt[0], pt[1]);
-        for(var i = 1; i < k; i++){
+        for(var i = 1; i <= k; i++){
             pt = Geometry.evaluateCurve(curve, i / k);
             context.lineTo(pt[0], pt[1]);
         }
