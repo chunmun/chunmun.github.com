@@ -26,7 +26,8 @@ function GameEngine(canvas){
 
     this.assetManager = new AssetManager();
     // TODO need map initialisation
-
+    this.map = createDefaultMap();
+    
     this.hero = new Hero(DEFAULT_HERO_ARGS); // TODO need initialisation
     this.monsters = [];
     this.traps = [];
@@ -700,6 +701,9 @@ GameEngine.prototype.render = function(ctx){
     ctx.fillStyle = "#AFAFAF";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
+    
+    // Render paths, for debugging purposes.
+    this.map.renderMapPathData(ctx);
      
     // Draw (Renderable) Units
     for(var i = 0; i < this.gameObjects.length; i++){
@@ -718,7 +722,7 @@ GameEngine.prototype.render = function(ctx){
     var oldTextAlign = context.textAlign;
     
     // Render framerate, if needed.
-    if(DEBUG_SHOW_FRAMERATE){
+    if(!DEBUG_SHOW_FRAMERATE){
         context.font = 'italic 13px Arial';
         context.fillStyle = 'white';
         context.textAlign = 'left';
