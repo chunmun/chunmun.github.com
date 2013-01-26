@@ -66,11 +66,35 @@ function Monster(args){
 
 	this.health = args.health || HEALTH_MONSTER;
 	this.speed = args.speed || SPEED_MONSTER;
+	this.isActive = false;
+	
+	this.spriteAnimation = args.animation || null;
 }
 
 Monster.prototype = new GameObject();
 
+//Hans
+Monster.prototype.move = function(delta){
+	if(this.isActive){
+		this.spriteAnimation.update(delta);
+	}
+}
 
+Monster.prototype.render = function(ctx){
+	if(!this.isActive){
+		// Monster has not been activated
+		this.spriteAnimation.reset();
+	}
+	this.spriteAnimation.render(ctx,this.x,this.y,1,this.visibility);
+}
+
+Monster.prototype.canDealDamage = function(){
+	// This assumes that traps have their first frame as non-damaging frame
+	return (this.spriteAnimation.getIndex() != 0);
+}
+
+Monster.prototype.activate = function(){ this.isActive = true; }
+Monster.prototype.deactivate = function(){ this.isActive = false; }
 
 /*
 Augment GameObject with Trap characteristics
