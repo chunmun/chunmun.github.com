@@ -23,6 +23,7 @@ function GameEngine(canvas){
     this.gamePaused = true;
     this.gameState = GameEngineStates.PAUSED;
 
+    this.assetManager = new AssetManager();
     // TODO need map initialisation
 
     this.hero = new Hero(DEFAULT_HERO_ARGS); // TODO need initialisation
@@ -44,6 +45,7 @@ function GameEngine(canvas){
  Sets up the GameEngine with the document and supplied canvas.
 */
 GameEngine.prototype.init = function(canvas){
+    var that = this;
     this.setCanvas(canvas);
     this.debugCanvas = null;
     this.debugContext = null;
@@ -54,6 +56,15 @@ GameEngine.prototype.init = function(canvas){
     //document.onmousemove = this.canvasMouseMove.bind(this);
     canvas.onmousedown = this.canvasMouseDown.bind(this);
     canvas.onmousemove = this.canvasMouseMove.bind(this);
+
+    // load the image assets
+    this.assetManager.queueDownload("sprite/test.png"); // TODO load real assets
+    this.assetManager.downloadAll(function(){
+        var x = GAME_WIDTH/2, y = GAME_HEIGHT/2;
+        var hero_sprite = that.assetManager.getAsset("sprite/test.png");
+
+        that.context.drawImage(hero_sprite,x-sprite.width/2,y-sprite.height/2);
+    });
 };
 
 
@@ -470,19 +481,19 @@ GameEngine.prototype.handlePlayerInput = function(delta){
 
    if(this.keysPressed[37] && !this.keysPressed[39]){
      // console.log("Going Left");
-     this.Hero.moveLeft(delta);
+     this.hero.moveLeft(delta);
    }
    if(!this.keysPressed[37] && this.keysPressed[39]){
-     console.log("Going Right");
-     this.Hero.moveRight(delta);
+     // console.log("Going Right");
+     this.hero.moveRight(delta);
    }
    if(this.keysPressed[38] && !this.keysPressed[40]){
-     console.log("Going Up");
-     this.Hero.moveUp(delta);
+     // console.log("Going Up");
+     this.hero.moveUp(delta);
    }
    if(!this.keysPressed[38] && this.keysPressed[40]){
-     console.log("Going Down");
-     this.Hero.moveDown(delta);
+     // console.log("Going Down");
+     this.hero.moveDown(delta);
    }
 };
 
@@ -607,8 +618,8 @@ GameEngine.prototype.render = function(ctx){
     this.updateUI();
     
     // Fill Background, and CityMap/Roads
-    ctx.fillStyle = "#AAAAAA";
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // ctx.fillStyle = "#AAAAAA";
+    // ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
    
     // Draw (Renderable) Units

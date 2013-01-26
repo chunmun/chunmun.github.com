@@ -23,7 +23,21 @@ function Hero(args){
 
 Hero.prototype = new GameObject();
 
+Hero.prototype.moveUp = function(delta){
+	console.log("Moving Up");
+}
 
+Hero.prototype.moveDown = function(delta){
+	console.log("Moving Down");
+}
+
+Hero.prototype.moveLeft = function(delta){
+	console.log("Moving Left");
+}
+
+Hero.prototype.moveRight = function(delta){
+	console.log("Moving Right");
+}
 
 /*
 Augment GameObject with Monster characteristics
