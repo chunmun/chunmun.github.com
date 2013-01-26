@@ -295,7 +295,6 @@ GameEngine.prototype.__moveBullets = function(delta){
 
             var z = this.monsters[j];
             if(bullet.hits(z)){
-                bullet.damage(z);
                 break;
             }
         }
@@ -338,11 +337,10 @@ GameEngine.prototype.move = function(delta){
         trap.move(delta, trap, this.map);
     }.bind(this));
 
-
-
     // Check collisions
     this.__checkCollisions();
     //this.__checkCollisionsNaive();
+    this.hero.move(delta);
 };
 
 
@@ -581,6 +579,7 @@ GameEngine.prototype.__checkTrapActivation = function(){
     }
     if(close_traps[0]){
         close_traps[0].activate();
+        h.setHealth(h.getHealth()-close_traps[0].damage);
     }
 }
 

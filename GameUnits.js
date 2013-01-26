@@ -79,6 +79,8 @@ Hero.prototype.moveLeft = function(delta){
 Hero.prototype.move = function(delta){
 	this.setX(this.getX());
 	this.setY(this.getY());
+	this.health -= delta*10;
+	console.log(this.health);
 }
 
 Hero.prototype.render = function(ctx){
