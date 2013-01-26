@@ -2,8 +2,8 @@
 File for GameUnits - Hero, Monsters, Traps and Bullets
 */
 
-var SPEED_HERO = 25.0;
-var SPEED_MONSTER = 10.0;
+var SPEED_HERO = 50.0;
+var SPEED_MONSTER = 40.0;
 
 var HEALTH_HERO = 1000;
 var HEALTH_MONSTER = 50;
@@ -25,32 +25,33 @@ function Hero(args){
 	this.spriteSheet = args.spriteSheet;
 	this.upAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"up1",length:1},{spriteName:"up2",length:1},{spriteName:"up3",length:1},{spriteName:"up4",length:1}],
+		animation:[{spriteName:"up1",length:0.1},{spriteName:"up2",length:0.1},{spriteName:"up3",length:0.1},{spriteName:"up4",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
 
 	this.downAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"dn1",length:1},{spriteName:"dn2",length:1},{spriteName:"dn3",length:1},{spriteName:"dn4",length:1}],
+		animation:[{spriteName:"dn1",length:0.1},{spriteName:"dn2",length:0.1},{spriteName:"dn3",length:0.1},{spriteName:"dn4",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
 
 	this.leftAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"lf1",length:1},{spriteName:"lf2",length:1},{spriteName:"lf3",length:1},{spriteName:"lf4",length:1}],
+		animation:[{spriteName:"lf1",length:0.1},{spriteName:"lf2",length:0.1},{spriteName:"lf3",length:0.1},{spriteName:"lf4",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
 
 	this.rightAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"rg1",length:1},{spriteName:"rg2",length:1},{spriteName:"rg3",length:1},{spriteName:"rg4",length:1}],
+		animation:[{spriteName:"rg1",length:0.1},{spriteName:"rg2",length:0.1},{spriteName:"rg3",length:0.1},{spriteName:"rg4",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
-	console.log(this.downAnimation);
+
+	
 }
 
 Hero.prototype = new GameObject();
@@ -65,30 +66,43 @@ Hero.prototype.moveDown = function(delta){
 	this.downAnimation.update(delta);
 }
 
-Hero.prototype.moveLeft = function(delta){
-	this.setX(Math.max(0,this.getX()-delta*this.getSpeed()));
-	this.leftAnimation.update(delta);
-}
-
 Hero.prototype.moveRight = function(delta){
-	this.setX(Math.min(GAME_WIDTH,this.getX()+delta*this.getSpeed()));
+	this.setX(Math.max(0,this.getX()+delta*this.getSpeed()));
 	this.rightAnimation.update(delta);
 }
 
+Hero.prototype.moveLeft = function(delta){
+	this.setX(Math.min(GAME_WIDTH,this.getX()-delta*this.getSpeed()));
+	this.leftAnimation.update(delta);
+}
+
+Hero.prototype.move = function(delta){
+	this.setX(this.getX());
+	this.setY(this.getY());
+}
+
 Hero.prototype.render = function(ctx){
-	if(this.getPreviousX()<this.getX()){
+	// console.log((this.getPreviousX()-this.getX())+':'+this.getX());
+	if(this.getPreviousX()>this.getX()){
 		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
-	} else if(this.getPreviousX()>this.getX()){
+		this.setX(this.getX());
+		return;
+	} else if(this.getPreviousX()<this.getX()){
 		this.rightAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
-	} else if(this.getPreviousY()>this.getY()){
-		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		this.setX(this.getX());
+		return;
 	} else if(this.getPreviousY()<this.getY()){
+		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		this.setY(this.getY());
+		return;
+	} else if(this.getPreviousY()>this.getY()){
 		this.upAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);		
+		this.setY(this.getY());
+		return;
 	} else {
-		console.log("HERE");
-		console.log(this.downAnimation);
 		this.downAnimation.reset();
 		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		return;
 	}
 
 }

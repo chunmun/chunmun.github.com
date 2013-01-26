@@ -42,7 +42,7 @@ SpriteSheet.prototype.getOffset = function(spriteName) {
             return {
                 image: this._image,
                 x: ((i%this._cols) * this._width) + (sprite.x||0),
-                y: (Math.floor(i/this._rows) * this._height) + (sprite.y||0),
+                y: (Math.floor(i/this._cols) * this._height) + (sprite.y||0),
                 width: this._width,
                 height: this._height
             };

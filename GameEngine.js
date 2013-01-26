@@ -8,7 +8,7 @@ var GAME_WIDTH = 480;
 
 var MAX_MONSTER_COUNT = 10;
 
-var MAX_DELTA = 0.05;
+var MAX_DELTA = 0.5;
 var DEBUG_SHOW_FRAMERATE = true;
 
 /**
@@ -167,7 +167,7 @@ GameEngine.prototype.spawnTraps = function(){
         sprites:[{name:'neutral',x:0, y:0},{name:'reset'},{name:'ready'}]});
     var trap_animation = new Animation({
         spriteSheet:trap_ss,
-        animation:[{spriteName:'neutral',length:0},
+        animation:[{spriteName:'neutral',length:0.1},
                    {spriteName:'reset',length:0.1},
                    {spriteName:'ready',length:0.5}],
         repeat:true,
@@ -203,7 +203,7 @@ GameEngine.prototype.spawnHero = function(){
         y:GAME_HEIGHT/2, 
         visibility:1, 
         damage:0, 
-        scale:1, 
+        scale:0.3, 
         spriteSheet:(function(){
             var hero_sprite = that.assetManager.getAsset("sprite/hero.png");
             var hero_ss = new SpriteSheet({
@@ -337,6 +337,7 @@ GameEngine.prototype.move = function(delta){
     this.traps.forEach(function(trap){
         trap.move(delta, trap, this.map);
     }.bind(this));
+
 
 
     // Check collisions
