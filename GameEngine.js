@@ -184,7 +184,7 @@ GameEngine.prototype.spawnMonsters = function(){
         x:cpt[0], 
         y:cpt[1], 
         visibility:1, 
-        damage:0, 
+        damage:30, 
         scale:0.3,
         carrot: carrot,
         spriteSheet:(function(){
@@ -258,6 +258,8 @@ GameEngine.prototype.spawnTraps = function(){
         }
     }
 
+    //var result = this.traps.map(function(trap) { return {x:trap.x,y:trap.y};});
+    //console.log(result);
     console.log(this.traps);
     console.log("Finished spawning traps");
 }
@@ -432,87 +434,81 @@ GameEngine.prototype.move = function(delta){
     this.heart.update(delta);
 };
 
-
-
 GameEngine.prototype.__checkCollisions = function(){
-    return; // TODO 
+    //return; // TODO 
     /*
       The idea is that we check for collisions only
        for units which are 'close' to each other by
        dividing the map into grid squares.
     */
 
-    var grid_width = 30;
-    var grid_height = grid_width;
-    
-    var num_bucket_cols = Math.ceil(GAME_WIDTH / grid_width);
-    var num_bucket_rows = Math.ceil(GAME_HEIGHT / grid_height);
-    
-    var arr = [];
-    
-    // Initialise our 'buckets'
-    for(var i = 0; i <= num_bucket_rows; i++){
-        arr[i] = [];
-        for(var j = 0; j <= num_bucket_cols; j++){
-            arr[i][j] = [];
-        }
-    }
-    
+                        // var grid_constant = 30;
+                        
+                        // var num_bucket_cols = Math.ceil(GAME_WIDTH / grid_constant);
+                        // var num_bucket_rows = Math.ceil(GAME_HEIGHT / grid_constant);
+                        
+                        // var arr = [];
+                        
+                        // // Initialise our 'buckets'
+                        // for(var i = 0; i <= num_bucket_rows; i++){
+                        //     arr[i] = [];
+                        //     for(var j = 0; j <= num_bucket_cols; j++){
+                        //         arr[i][j] = [];
+                        //     }
+                        // }
+                        
     // Go through units, adding them to the appropriate list(s).
+    var arr = [];
+    var c = 0;
+
     this.gameObjects.forEach(function(m){
-        var bbox = m.getBoundingBox();
-        
-        var gridColLeft = Math.floor(bbox[0] / grid_width);
-        var gridColRight = Math.ceil((bbox[0] + bbox[2]) / grid_width);
-        
-        var gridRowTop = Math.floor(bbox[1] / grid_height);
-        var gridRowBottom = Math.ceil((bbox[1] + bbox[3]) / grid_height);
-        
-        // Add to arrays as necessary
-        arr[gridRowTop][gridColLeft].push(m);
-        
-        if(gridColRight > gridColLeft){ arr[gridRowTop][gridColRight].push(m); }
-        if(gridRowBottom > gridRowTop){ arr[gridRowBottom][gridColLeft].push(m); }
-        if(gridColRight > gridColLeft &&
-           gridRowBottom > gridRowTop){ arr[gridRowBottom][gridColRight].push(m); }
+        arr[c] = m;
+        c++;
     });
     
     
     // Now check for collisions in each of the 'buckets'.
-    for(var i = 0; i < num_bucket_rows; i++){
-        for(var j = 0; j < num_bucket_cols; j++){
-            this.__checkCollisionsInArray(arr[i][j]);
+    for(var i = 0; i < arr.length; i++){
+        for(var j = i+1; j < arr.length; j++){
+            var xVal = arr[i].x-arr[j].x;
+            var xValSq = xVal*xVal;
+            var yVal = arr[i].y-arr[j].y;
+            var yValSq = yVal*yVal;
+            var dist = xValSq + yValSq;
+            if (dist < 200){
+                this.handleCollision(arr[i], arr[j]);
+            }
         }
     }
 };
 
 
 
-GameEngine.prototype.__checkCollisionsInArray = function(arr){
-    // Check for collisions with every unit in the array
-    //  against every other unit in the array.
-    for(var i = 0; i < arr.length; i++){
-        if(arr[i]){
-            var mover = arr[i];
-                    
-            if(arr[i].removed){ continue; }
+                        // GameEngine.prototype.__checkCollisionsInArray = function(arr){
+                        //     // Check for collisions with every unit in the array
+                        //     //  against every other unit in the array.
+                        //     for(var i = 0; i < arr.length; i++){
+                        //         if(arr[i]){
+                        //             var mover = arr[i];
+                                            
+                        //             if(arr[i].removed){ continue; }
 
-            if(mover.collidesWith){
-                for(var j = 0; j < arr.length; j++){
-                    if(i === j) continue;
+                        //             if(mover.arr[j]){
+                        //                 for(var j = 0; j < arr.length; j++){
+                        //                     if(i === j) continue;
 
-                    var other = arr[j];
-                    
-                    if(arr[j].removed){ continue; }
+                        //                     var other = arr[j];
+                                            
+                        //                     if(arr[j].removed){ continue; }
 
-                    if(mover.collidesWith(other)){
-                        this.handleCollision(mover, other);
-                    }
-                }
-            }
-        }
-    }
-}
+                        //                     if(mover.collidesWith(other)){
+                        //                         this.handleCollision(mover, other);
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
 
 
 
@@ -539,7 +535,7 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
    }else if(obj1 instanceof Trap){
      if(obj2 instanceof Monster){
        // Trap-Monster
-       obj2.setHealth(obj2.getHeath()-obj1.getDamage());
+       obj2.setHealth(obj2.getHealth()-obj1.getDamage());
      }else if(obj2 instanceof Trap){
         // Trap-Trap
         // This shld not happen
@@ -579,7 +575,7 @@ GameEngine.prototype.destroyObject = function(movingObj){
 function removeFromList(obj, list){
     var oldLength = list.length;
     for(var i = 0; i < list.length; i++){
-        if(obj === list[i] || obj.equals(list[i])){
+        if(obj === list[i] ){ //|| obj.equals(list[i])){
             list.splice(i, 1);
             return;
         }
@@ -592,9 +588,9 @@ function removeFromList(obj, list){
 
 
 GameEngine.prototype.removeObject = function(gameObj){
-    if(!gameObj.equals){
-        throw "Expects object to have equals functionality.";
-    }
+                    // if(!gameObj.equals){
+                    //     throw "Expects object to have equals functionality.";
+                    // }
 
     removeFromList(gameObj, this.gameObjects);
     
@@ -964,7 +960,7 @@ GameEngine.prototype.canvasMouseMove = function(ev){
             _y += el.offsetTop - el.scrollTop;
             el = el.offsetParent;
         }
-        return { top: _y, left: _x };
+        return { top: _y, left: _x }
     }
     offset = getOffset(this.canvas);
     
