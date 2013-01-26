@@ -3,10 +3,7 @@ var GameEngineStates = {PAUSED:  0,
                         LOST:    2,
                         WON:     4};
 
-var MAX_ZOMBIE_COUNT = 0;
-var MAX_CIVILIAN_COUNT = 0;
-var MAX_SOLDIER_COUNT = 0;
-var GAME_DEFAULT_NUMBER_ZOMBIES = 0;
+var MAX_MONSTER_COUNT = 10;
 
 var DEBUG_SHOW_FRAMERATE = true;
 
@@ -18,24 +15,17 @@ function GameEngine(canvas){
     this.mouseX = -1;
     this.mouseY = -1;
     this.keysPressed = [];
-    this.movable = [];
-    this.renderable = [];
+    this.gameObjects = [];
     this.gamePaused = true;
     this.gameState = GameEngineStates.PAUSED;
 
-    this.cityMap;
+    // TODO need map initialisation
 
-    this.zombies = [];
-    this.civilians = [];
-    this.soldiers = [];
-    
-    this.numZombiesAvailableToSpawn = GAME_DEFAULT_NUMBER_ZOMBIES;
+    this.hero = new Hero(); // TODO need initialisation
+    this.monsters = [];
+    this.traps = [];
 
     this.bullets = [];
-    this.smokeEmitters = [];
-    this.placedInfluencers = [];
-    this.currentInfluencer = null;
-    this.zombie_timer = 0;
     this.gameSpeed = 1;
     
     this.__unit_counter = 0;
@@ -79,20 +69,14 @@ GameEngine.prototype.setDebugCanvas = function(c){
 
 
 GameEngine.prototype.clearWorld = function(){
-    this.movable = [];
-    this.renderable = [];
+    this.gameObjects = [];
 
-    this.zombies = [];
-    this.civilians = [];
-    this.soldiers = [];
-    
-    this.numZombiesAvailableToSpawn = GAME_DEFAULT_NUMBER_ZOMBIES;
+    this.hero = new Hero(); // TODO need initialisation
+    this.monsters = [];
+    this.traps = [];
 
     this.bullets = [];
-    this.smokeEmitters = [];
-    this.placedInfluencers = [];
-    this.currentInfluencer = null;
-    this.zombie_timer = 0;
+    this.gameSpeed = 1;
 }
 
 
@@ -113,124 +97,46 @@ GameEngine.prototype.pause = function(){
 
 
 
-GameEngine.prototype.spawnZombie = function(){
-    /*
-        This spawns a zombie from the start point of the
-        first road added to CityMap, (which is the top-left road)
-        which is great for the demo-skeleton, but
-        isn't nearly so general as should be preferred.
-        TODO: Spawning of zombies.
-    */
-    
-    var id = "zombie" + ("000" + this.__unit_counter).slice(-3);
-    this.__unit_counter++;
-    
-    var pt = this.cityMap.spawnpoint;
-    var rd = this.cityMap.getRoadAt(pt);
-    var zombie = new Zombie({id: id, x: pt[0], y: pt[1] + ZOMBIE_SQUARE_HALFWIDTH + 1}); // Magic value
-
-    zombie.setCurrentRoad(rd);
-
-    //var destPt = Geometry.midpoint(rd.getExitInDirection(ROAD_DIRECTION_SOUTH));
-    var isectRd;
-    for(var i=0;i<ROAD_DIRECTIONS.length;i++){
-        isectRd = rd.getAdjacentRoads()[ROAD_DIRECTIONS[i]]
-        if(isectRd instanceof Road){
-            var destPt = Geometry.midpoint([isectRd.getStartPoint(), isectRd.getEndPoint()]);
-            zombie.setDestinationPoint(destPt);
-            zombie.setMoveAngle(3 * Math.PI / 2); //TODO: Need to check what this does
-            break;}
-    }
-
-    this.zombies.push(zombie);
-    this.movable.push(zombie);
-    this.renderable.push(zombie);
-    
-    this.__updateFocusComboBox();
-}
-
-
-
 
 /*
     For Game setup, populate the map with some amount of humans.
 */
-GameEngine.prototype.__populateMapWithCivilians = function(){
-    while(this.civilians.length < MAX_CIVILIAN_COUNT){
-        // Spawn a Civilian somewhere random on the map.
-        var id = "civilian" + ("000" + this.__unit_counter).slice(-3);
+GameEngine.prototype.__populateMapWithMonsters = function(){
+    while(this.monsters.length < MAX_MONSTER_COUNT){
+        // Spawn a monster somewhere random on the map.
+        var id = "monster" + ("000" + this.__unit_counter).slice(-3);
         this.__unit_counter++;
     
-        var rds = this.cityMap.getRoads();
-        var rd = rds[Math.floor(Math.random() * rds.length)];
-        var rdBBox = rd.getBoundingBox();
+    //     var rds = this.cityMap.getRoads();
+    //     var rd = rds[Math.floor(Math.random() * rds.length)];
+    //     var rdBBox = rd.getBoundingBox();
         
-        var cx, cy;
-        if(rd.isVertical){
-            cx = rdBBox[0] + rdBBox[2] / 2;
-            cy = rdBBox[1] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[3] - 2*CIVILIAN_SQUARE_HALFWIDTH);
-        } else {
-            cx = rdBBox[0] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[2] - 2*CIVILIAN_SQUARE_HALFWIDTH);
-            cy = rdBBox[1] + rdBBox[3] / 2;
-        }
-        var civ = new Civilian({id: id, x: cx, y: cy});
+    //     var cx, cy;
+    //     if(rd.isVertical){
+    //         cx = rdBBox[0] + rdBBox[2] / 2;
+    //         cy = rdBBox[1] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[3] - 2*CIVILIAN_SQUARE_HALFWIDTH);
+    //     } else {
+    //         cx = rdBBox[0] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[2] - 2*CIVILIAN_SQUARE_HALFWIDTH);
+    //         cy = rdBBox[1] + rdBBox[3] / 2;
+    //     }
+    //     var civ = new Civilian({id: id, x: cx, y: cy});
         
-        civ.setCurrentRoad(rd);
-        civ.setCurrentRoad(rd);
+    //     civ.setCurrentRoad(rd);
+    //     civ.setCurrentRoad(rd);
         
-        civ.setDestinationPoint([cx, cy]);
+    //     civ.setDestinationPoint([cx, cy]);
         
-        civ.setMoveAngle(rd.isVertical ? [Math.PI / 2, 3 * Math.PI / 2][Math.floor(Math.random()*2)] :
-                                         [0, Math.PI][Math.floor(Math.random()*2)]);
+    //     civ.setMoveAngle(rd.isVertical ? [Math.PI / 2, 3 * Math.PI / 2][Math.floor(Math.random()*2)] :
+    //                                      [0, Math.PI][Math.floor(Math.random()*2)]);
         
-        this.civilians.push(civ);
-        this.movable.push(civ);
-        this.renderable.push(civ);
-    }
+    //     this.civilians.push(civ);
+    //     this.movable.push(civ);
+    //     this.renderable.push(civ);
+    // }
     
     this.__updateFocusComboBox();
 }
 
-
-
-/*
-    For Game setup, populate the map with some amount of humans.
-*/
-GameEngine.prototype.__populateMapWithSoldiers = function(){
-    while(this.soldiers.length < MAX_SOLDIER_COUNT){
-        // Spawn a Soldier somewhere random on the map.
-        var id = "soldiers" + ("000" + this.__unit_counter).slice(-3);
-        this.__unit_counter++;
-    
-        var rds = this.cityMap.getRoads();
-        var rd = rds[Math.floor(Math.random() * rds.length)];
-        var rdBBox = rd.getBoundingBox();
-        
-        var cx, cy;
-        if(rd.isVertical){
-            cx = rdBBox[0] + rdBBox[2] / 2;
-            cy = rdBBox[1] + SOLDIER_SQUARE_HALFWIDTH + Math.random() * (rdBBox[3] - 2*SOLDIER_SQUARE_HALFWIDTH);
-        } else {
-            cx = rdBBox[0] + SOLDIER_SQUARE_HALFWIDTH + Math.random() * (rdBBox[2] - 2*SOLDIER_SQUARE_HALFWIDTH);
-            cy = rdBBox[1] + rdBBox[3] / 2;
-        }
-        var civ = new Soldier({id: id, x: cx, y: cy});
-        
-        civ.setCurrentRoad(rd);
-        civ.setCurrentRoad(rd);
-        
-        civ.setDestinationPoint([cx, cy]);
-        
-        civ.setMoveAngle(rd.isVertical ? [Math.PI / 2, 3 * Math.PI / 2][Math.floor(Math.random()*2)] :
-                                         [0, Math.PI][Math.floor(Math.random()*2)]);
-        
-        this.soldiers.push(civ);
-        this.movable.push(civ);
-        this.renderable.push(civ);
-    }
-    
-    this.__updateFocusComboBox();
-}
 
 
 
@@ -260,8 +166,6 @@ GameEngine.prototype.tick = function tick(lastTime){
     // for framerate
     this.__fps = 1000 / delta;
 
-    this.__tickInfluencers(delta);
-    this.__tickParticleEmitters(delta);
     this.move(delta);
     
     this.__checkGameTerminationConditions();
@@ -271,11 +175,6 @@ GameEngine.prototype.tick = function tick(lastTime){
         this.renderDebugCanvas(this.debugContext);
     }
     
-    // Assert that |zombies| < MaxZombies + MaxCivs.
-    if(this.zombies.length > MAX_CIVILIAN_COUNT + GAME_DEFAULT_NUMBER_ZOMBIES + MAX_SOLDIER_COUNT){
-        throw "Error! Too many zombies spawned somehow.";
-    }
-
     //Call function again
     if(!this.gamePaused){
         window.setTimeout(this.myTick, 10, time);
@@ -288,95 +187,16 @@ GameEngine.prototype.tick = function tick(lastTime){
   Checks whether the game has yet been won or lost.
 */
 GameEngine.prototype.__checkGameTerminationConditions = function(){
-    // The game is lost if there are no more zombies, AND
-    //  there are no more zombies available.
-    if(this.zombies.length === 0 && this.numZombiesAvailableToSpawn === 0){
-        this.gameState = GameEngineStates.LOST;
-    }
-    
-    // The game is won if there are no more civilians or soldiers
-    //  left alive on the map. They must all be zombies.
-    if(this.civilians.length + this.soldiers.length === 0){
+    // The game is won if there are no more monsters
+    if(this.monsters.length === 0){
         this.gameState = GameEngineStates.WON;
     }
-}
-
-
-
-GameEngine.prototype.__tickInfluencers = function(delta){
-    // Update Influencers
-    this.placedInfluencers.forEach(function(inflr){
-        inflr.tick(delta);
-    });
-    var expiredInfluencers = this.placedInfluencers.filter(function(inflr){
-        return inflr.isExpired();
-    });
-    expiredInfluencers.forEach(function(inflr){
-        removeFromList(inflr, this.placedInfluencers);
-    }.bind(this));
-}
-
-
-
-GameEngine.prototype.__tickParticleEmitters = function(delta){
-    // TODO: Abstract this common clause.
-    this.smokeEmitters.forEach(function(emitter){
-        emitter.tick(delta);
-    });
-    var expiredEmitters = this.smokeEmitters.filter(function(emitter){
-        return emitter.isExpired();
-    });
-    expiredEmitters.forEach(function(emitter){
-        removeFromList(emitter, this.smokeEmitters);
-    }.bind(this));
-}
-
-
-
-GameEngine.prototype.__checkSoldierTarget = function(soldier) {
-    /*
-      Here we will check that soldier is targetting the zombie
-      closest to itself. (Another way might be to only switch 
-      targets if the Soldier has no target);
-    */
-
-    if(soldier.target){
-        if(!this.cityMap.clearLineOfSight([soldier.x, soldier.y],
-                                          [soldier.target.x, soldier.target.y])){
-            soldier.target = null;
-        } else if(soldier.target.isExpired()){
-            soldier.target = null;
-        }
+    
+    // The game is lost if the hero has no more health 
+    if(this.hero.getHealth() <= 0){
+        this.gameState = GameEngineStates.LOST;
     }
-
-    var selectClosestTarget = true;
-    if(selectClosestTarget || !soldier.target){
-        var targetsInRange = this.zombies.filter(function(z){
-            // Can target zombie if zombie in line of sight.
-            return this.cityMap.clearLineOfSight([soldier.x, soldier.y],
-                                                 [z.x, z.y])
-                && soldier.getDistanceToUnit(z) < soldier.getRange();
-        }.bind(this));
-
-        if(targetsInRange.length > 0){
-            var newTarget = targetsInRange.reduce(function(z1, z2){
-                var d1 = soldier.getDistanceToUnit(z1);
-                var d2 = soldier.getDistanceToUnit(z1);
-                return d1 < d2 ? z1 : z2;
-            });
-
-            soldier.target = newTarget;
-        }
-    }
-
-    // Maybe shoot at the targets if we can
-    if(soldier.canShoot()){
-        var bullet = soldier.createBullet();
-
-        this.bullets.push(bullet);
-        this.renderable.push(bullet);
-    }
-};
+}
 
 
 
@@ -386,10 +206,10 @@ GameEngine.prototype.__moveBullets = function(delta){
         bullet.move(delta);
 
         // NOTE: Here we assume Bullets only damage Zombies.
-        for(var j = 0; j < this.zombies.length; j++){
-            if(!this.zombies[j]){ continue; }
+        for(var j = 0; j < this.monsters.length; j++){
+            if(!this.monsters[j]){ continue; }
 
-            var z = this.zombies[j];
+            var z = this.monsters[j];
             if(bullet.hits(z)){
                 bullet.damage(z);
                 break;
@@ -401,7 +221,6 @@ GameEngine.prototype.__moveBullets = function(delta){
     });
     expiredBullets.forEach(function(bullet){
         removeFromList(bullet, this.bullets);
-        removeFromList(bullet, this.renderable);
     }.bind(this));
 };
 
@@ -415,61 +234,26 @@ GameEngine.prototype.move = function(delta){
     this.handlePlayerInput();
     this.__moveBullets(delta);
 
-
-
-    // Move ZOMBIES
-    this.zombies.forEach(function(zombie){
-        var inflrs = this.placedInfluencers.filter(function(inflr){
-                                                       return inflr.hasInfluenceOnUnit(zombie);
-                                                   });
-        do_zombie_move_smarter(delta, zombie, this.cityMap, inflrs);
+    // Move Monsters
+    this.monsters.forEach(function(monsters){
+        do_monster_move(delta, zombie, this.cityMap, inflrs);
     }.bind(this));
-    var expiredZombies = this.zombies.filter(function(zombie){
-        return zombie.isExpired();
+
+    // Remove dead monsters
+    var expiredMonsters = this.monsters.filter(function(monsters){
+        return monster.isExpired();
     });
-    expiredZombies.forEach(function(zombie){
-        this.removeObject(zombie);
-        removeFromList(zombie, this.zombies);
-    }.bind(this));
-
-    // Maybe Spawn ZOMBIES
-    this.zombie_timer += delta;
-    if(this.zombie_timer > 1000){
-        this.zombie_timer -= 1000;
-
-        // We check that there are zombies available, so we can limit the number of
-        // zombies spawned. -1 means Infinite number of zombies will spawn.
-        var hasZombiesToSpawn = this.numZombiesAvailableToSpawn > 0 ||
-                                (this.numZombiesAvailableToSpawn === -1 && this.zombies.length < MAX_ZOMBIE_COUNT);
-        
-        if(hasZombiesToSpawn){
-            this.spawnZombie();
-            this.numZombiesAvailableToSpawn--;
-        }
-    }
-    
-
-
-    // Move CIVILIANS
-    this.civilians.forEach(function(civ){
-        var inflrs = this.placedInfluencers.filter(function(inflr){
-                                                       return inflr.hasInfluenceOnUnit(civ);
-                                                   });
-        do_civilian_move(delta, civ, this.cityMap, inflrs);
+    expiredMonsters.forEach(function(monster){
+        this.removeObject(monster);
+        removeFromList(monster, this.monsters);
     }.bind(this));
 
 
-
-    // Move SOLDIERS
-    this.soldiers.forEach(function(soldier){
-        var inflrs = this.placedInfluencers.filter(function(inflr){
-                                                       return inflr.hasInfluenceOnUnit(soldier);
-                                                   });
-        this.__checkSoldierTarget(soldier);
-        do_soldier_move(delta, soldier, this.cityMap, inflrs);
+    // Move Traps
+    this.traps.forEach(function(trap){
+        do_trap_move(delta, trap, this.map);
     }.bind(this));
 
-    
 
     // Check collisions
     this.__checkCollisions();
@@ -502,7 +286,7 @@ GameEngine.prototype.__checkCollisions = function(){
     }
     
     // Go through units, adding them to the appropriate list(s).
-    this.movable.forEach(function(m){
+    this.gameObjects.forEach(function(m){
         var bbox = m.getBoundingBox();
         
         var gridColLeft = Math.floor(bbox[0] / grid_width);
@@ -566,55 +350,44 @@ GameEngine.prototype.__checkCollisionsNaive = function(){
 
 
 GameEngine.prototype.handleCollision = function(obj1, obj2){
-    // Resolve the collision between objects obj1 and obj2.
-    if(obj1 instanceof Zombie && obj2 instanceof Civilian){
-        // Convert civilian to zombie
-        this.__convertHumanToZombie(obj2);
-    }
-    if(obj1 instanceof Zombie && obj2 instanceof Soldier){
-        // Convert soldier to zombie
-        this.__convertHumanToZombie(obj2);
-    }
+   // Resolve collision between Hero, Monster and traps
+   // Monster damages HERO
+   if(obj1 instanceof Monster){
+     if(obj2 instanceof Monster){
+       // Monster-monster do nothing 
+       // Might want to do collision for them
+     }else if(obj2 instanceof Trap){
+        // Monster-Trap
+        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+     }else{
+        // Monster-Hero
+        obj2.setHealth(obj2.getHealth()-obj1.getDamage());
+     }
+   }else if(obj1 instanceof Trap){
+     if(obj2 instanceof Monster){
+       // Trap-Monster
+       obj2.setHealth(obj2.getHeath()-obj1.getDamage());
+     }else if(obj2 instanceof Trap){
+        // Trap-Trap
+        // This shld not happen
+     }else{
+        // Trap-Hero
+        // Nothing should happen
+     }
+   }else{
+     if(obj2 instanceof Monster){
+        // Hero-Monster
+        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+     }else if(obj2 instanceof Trap){
+        // Hero-Trap
+        // Nothing should happen
+     }else{
+        // Hero-Hero
+        // This shld not happen
+     }
+   }
 };
 
-
-
-/*
-  Converts a Human (civilian, soldier, etc.) into a zombie.
-*/
-GameEngine.prototype.__convertHumanToZombie = function(hum){
-    this.removeObject(hum);
-    switch(hum.getObjectType()){ // Check which list we need to remove human from.
-    case ObjectTypes.CIVILIAN:
-        removeFromList(hum, this.civilians);
-        break;
-    case ObjectTypes.SOLDIER:
-        removeFromList(hum, this.soldiers);
-        break;
-    }
-    
-    var id = "zombie" + ("000" + this.__unit_counter).slice(-3);
-    this.__unit_counter++;
-    
-    var pt = [hum.getX(), hum.getY()];
-    var rd = this.cityMap.getRoadAt(pt);
-    var zombie = new Zombie({id: id, x: pt[0], y: pt[1]});
-
-    // for the Zombie movement AI.
-    zombie.setCurrentRoad(rd);
-    zombie.setCurrentRoad(rd);
-
-    zombie.setDestinationPoint(pt);
-    
-    zombie.setMoveAngle(rd.isVertical ? [Math.PI / 2, 3 * Math.PI / 2][Math.floor(Math.random()*2)] :
-                                     [0, Math.PI][Math.floor(Math.random()*2)]);
-
-    this.zombies.push(zombie);
-    this.movable.push(zombie);
-    this.renderable.push(zombie);
-    
-    this.__updateFocusComboBox();
-};
 
 
 
@@ -645,17 +418,16 @@ function removeFromList(obj, list){
 
 
 
-GameEngine.prototype.removeObject = function(movingObj){
-    if(!movingObj.equals){
+GameEngine.prototype.removeObject = function(gameObj){
+    if(!gameObj.equals){
         throw "Expects object to have equals functionality.";
     }
 
-    removeFromList(movingObj, this.movable);
-    removeFromList(movingObj, this.renderable);
+    removeFromList(gameObj, this.gameObjects);
     
     // This fixes a bug wherein we when checking collisions,
     // an object might have been removed more than once.
-    movingObj.removed = true;
+    gameObj.removed = true;
 }
 
 
@@ -810,67 +582,6 @@ GameEngine.prototype.updateUI = function(){
 
 
 
-GameEngine.prototype.__renderInfluencersUnder = function(ctx){
-    var unitArrays = [this.zombies, this.civilians];
-    function drawUnderUnits(ctx, inflr){
-        unitArrays.forEach(function(arr){
-            arr.forEach(function(unit){
-                inflr.drawEffectUnderUnitPreview(ctx, unit)
-            });
-        });
-    }
-    
-    this.placedInfluencers.forEach(function(inflr){
-        drawUnderUnits(ctx, inflr);
-    }.bind(this));
-    
-    // Draw Influencer *under* units
-    var mouseOnScreen = 0 < this.mouseX && this.mouseX < GAME_WIDTH &&
-                        0 < this.mouseY && this.mouseY < GAME_HEIGHT;
-    if(this.currentInfluencer && mouseOnScreen){
-        drawUnderUnits(ctx, this.currentInfluencer);
-    }
-}
-
-
-
-GameEngine.prototype.__renderInfluencersOver = function(ctx){
-    var unitArrays = [this.zombies, this.civilians];
-    function drawOverUnits(ctx, inflr){
-        unitArrays.forEach(function(arr){
-            arr.forEach(function(unit){
-                inflr.drawEffectOnUnitPreview(ctx, unit)
-            });
-        });
-    }
-    
-    this.placedInfluencers.forEach(function(inflr){
-        drawOverUnits(ctx, inflr);
-    }.bind(this));
-    
-    // Draw Influencer *under* units
-    var mouseOnScreen = 0 < this.mouseX && this.mouseX < GAME_WIDTH &&
-                        0 < this.mouseY && this.mouseY < GAME_HEIGHT;
-    if(this.currentInfluencer && mouseOnScreen){
-        drawOverUnits(ctx, this.currentInfluencer);
-    }
-}
-
-
-
-GameEngine.prototype.__renderInfluencers = function(ctx){
-    this.placedInfluencers.forEach(function(inflr){
-        inflr.drawEffectiveArea(ctx);
-    });
-    
-    var mouseOnScreen = 0 < this.mouseX && this.mouseX < GAME_WIDTH &&
-                        0 < this.mouseY && this.mouseY < GAME_HEIGHT;
-    if(this.currentInfluencer && mouseOnScreen){
-        this.currentInfluencer.drawEffectiveAreaPreview(ctx);
-    }
-}
-
-
 
 /*
  Render objects to canvas' context.
@@ -882,28 +593,14 @@ GameEngine.prototype.render = function(ctx){
     ctx.fillStyle = "#AAAAAA";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
-
-    // Draw Influencer *under* units
-    this.__renderInfluencersUnder(ctx);
-    
-    // Draw Influencers
-    this.__renderInfluencers(ctx);
-    
+   
     // Draw (Renderable) Units
-    for(var i = 0; i < this.renderable.length; i++){
-        if(this.renderable[i]){
-            this.renderable[i].render(ctx);
+    for(var i = 0; i < this.gameObjects.length; i++){
+        if(this.gameObjects[i]){
+            this.gameObjects[i].render(ctx);
         }
     }
-
-    // Draw Influencer *over* units
-    this.__renderInfluencersOver(ctx);
-    
-    // Render Smoke Emitters
-    this.smokeEmitters.forEach(function(emitter){
-        emitter.render(ctx);
-    });
-    
+   
     
     //
     // Text rendering
@@ -972,23 +669,6 @@ GameEngine.prototype.renderDebugCanvas = function (ctx){
     
     this.render(ctx);
     ctx.restore();
-}
-
-
-
-GameEngine.prototype.setCurrentInfluencer = function(inflr){
-    console.log("Influencer Set! " + inflr);
-    this.currentInfluencer = inflr;
-};
-
-
-
-GameEngine.prototype.getUnitsInInfluenceZone = function(inflr){
-    // Not necessarily a good idea to use this when influencing
-    //  movement.
-    return this.movable.filter(function(mvr){
-        return inflr.isUnitInInfluenceArea(mvr);
-    });
 }
 
 
