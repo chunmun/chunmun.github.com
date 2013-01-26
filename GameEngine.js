@@ -156,7 +156,44 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
     this.__updateFocusComboBox();
 };
 
-
+//Hans
+GameEngine.prototype.spawnMonsters = function(){
+    console.log('Spawning Monsters');
+    var that = this;
+    var monster_side_sprite = that.assetManager.getAsset("sprite/Monster 1 Sprite.png");
+    var monster_side_ss = new SpriteSheet({
+        image:monster_side_sprite,
+        width:200,
+        height:200,
+        sprites:[{name:'neutral'},{name:'move1'},{name:'move2'},{name:'move3'}]});
+    var monster_side_animation = new Animation({
+        spriteSheet:monster_side_ss,
+        animation:[{spriteName: 'neutral', length:0.2},
+                    {spriteName: 'move1', length:0.2},
+                    {spriteName: 'move2', length:0.1},
+                    {spriteName: 'move3', length:0.2}],
+        repeat:true,
+        keyFrame:0
+    });
+    
+    var monster = new Monster({
+        id : 'monster1 side',
+        x : GAME_WIDTH/2,
+        y : GAME_HEIGHT/2,
+        speed : 1,
+        max_speed : 2,
+        visibility : 1,
+        damage : 10,
+        prevX : GAME_WIDTH/2,
+        prevY : GAME_HEIGHT/2,
+        animation : monster_side_animation
+    });
+    monster.activate();
+    this.gameObjects.push(monster);
+    this.monsters.push(monster);
+    console.log(this.monsters);
+    console.log("Finished spawning monster");
+}
 
 GameEngine.prototype.spawnTraps = function(){
     console.log('Spawning Traps');
