@@ -158,34 +158,21 @@ GameObject.prototype.getBoundingBox = function(){
 // O(mn) time complexity.
 GameObject.prototype.collidesWith = function(polyObj){
     // Check that the other object has the right methods
-    if(!polyObj.getBoundingBox || !polyObj.calculatePolygonCoordinates){
+    if(!polyObj.getBoundingBox){
         return false;
     }
     
     // Check whether the bounding boxes overlap before
     // calculating whether they intersect.
-    // O(m + n)
     var rectA = this.getBoundingBox();
     var rectB = polyObj.getBoundingBox();
     var collisionMightExist = (rectA[0] + rectA[2] >= rectB[0] && rectA[0] <= rectB[0] + rectB[2]) &&
                               (rectA[1] + rectA[3] >= rectB[1] && rectA[1] <= rectB[1] + rectB[3]);
-    
-    if(!collisionMightExist){
-        return false;
-    }
-    
-    // A collision might exist,
-    // check that it does.
-    // O(mn)
-    var poly1 = this.calculatePolygonCoordinates();
-    var poly2 = polyObj.calculatePolygonCoordinates();
-    return Geometry.linePolygonIntersect([[this.getPreviousX(), this.getPreviousY()],
-                                          [this.getX(), this.getY()]],
-                                          poly2) ||
-           Geometry.linePolygonIntersect([[polyObj.getPreviousX(), polyObj.getPreviousY()],
-                                          [polyObj.getX(), polyObj.getY()]],
-                                          poly1) ||
-           Geometry.polygonsIntersect(poly1, poly2);
+
+    // Here we just reduce collision checking to whether the bounding boxes
+    //  touch. We do this so as to handle Sprite-based collision detection,
+    //  without worrying about per-pixel precision of objects.
+    return collisionMightExist;
 };
 
 

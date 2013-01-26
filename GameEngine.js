@@ -357,14 +357,13 @@ GameEngine.prototype.move = function(delta){
 
 
 GameEngine.prototype.__checkCollisions = function(){
-    return; // TODO 
     /*
       The idea is that we check for collisions only
        for units which are 'close' to each other by
        dividing the map into grid squares.
     */
 
-    var grid_width = 30;
+    var grid_width = 250;
     var grid_height = grid_width;
     
     var num_bucket_cols = Math.ceil(GAME_WIDTH / grid_width);
@@ -445,42 +444,42 @@ GameEngine.prototype.__checkCollisionsNaive = function(){
 
 
 GameEngine.prototype.handleCollision = function(obj1, obj2){
-   // Resolve collision between Hero, Monster and traps
-   // Monster damages HERO
-   if(obj1 instanceof Monster){
-     if(obj2 instanceof Monster){
-       // Monster-monster do nothing 
-       // Might want to do collision for them
-     }else if(obj2 instanceof Trap){
-        // Monster-Trap
-        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
-     }else{
-        // Monster-Hero
-        obj2.setHealth(obj2.getHealth()-obj1.getDamage());
-     }
-   }else if(obj1 instanceof Trap){
-     if(obj2 instanceof Monster){
-       // Trap-Monster
-       obj2.setHealth(obj2.getHeath()-obj1.getDamage());
-     }else if(obj2 instanceof Trap){
-        // Trap-Trap
-        // This shld not happen
-     }else{
-        // Trap-Hero
-        // Nothing should happen
-     }
-   }else{
-     if(obj2 instanceof Monster){
-        // Hero-Monster
-        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
-     }else if(obj2 instanceof Trap){
-        // Hero-Trap
-        // Nothing should happen
-     }else{
-        // Hero-Hero
-        // This shld not happen
-     }
-   }
+    // Resolve collision between Hero, Monster and traps
+    // Monster damages HERO
+    if(obj1 instanceof Monster){
+        if(obj2 instanceof Monster){
+            // Monster-monster do nothing 
+            // Might want to do collision for them
+        }else if(obj2 instanceof Trap){
+            // Monster-Trap
+            obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+        }else{
+            // Monster-Hero
+            obj2.setHealth(obj2.getHealth()-obj1.getDamage());
+        }
+    }else if(obj1 instanceof Trap){
+        if(obj2 instanceof Monster){
+            // Trap-Monster
+            obj2.setHealth(obj2.getHeath()-obj1.getDamage());
+        }else if(obj2 instanceof Trap){
+            // Trap-Trap
+            // This shld not happen
+        }else{
+            // Trap-Hero
+            // Nothing should happen
+        }
+    }else{
+        if(obj2 instanceof Monster){
+            // Hero-Monster
+            obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+        }else if(obj2 instanceof Trap){
+            // Hero-Trap
+            // Nothing should happen
+        }else{
+            // Hero-Hero
+            // This shld not happen
+        }
+    }
 };
 
 

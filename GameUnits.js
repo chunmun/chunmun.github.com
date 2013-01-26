@@ -73,6 +73,15 @@ function Monster(args){
 
 Monster.prototype = new GameObject();
 
+Monster.prototype.getBoundingBox = function(){
+    var monstWidth = 200;
+    var monstHeight = 200;
+    return [this.x,
+            this.y,
+            this.x + monstWidth,
+            this.y + monstHeight];
+}
+
 //Hans
 Monster.prototype.move = function(delta){
 	if(this.isActive){
@@ -113,6 +122,15 @@ function Trap(args){
 }
 
 Trap.prototype = new GameObject();
+
+Trap.prototype.getBoundingBox = function(){
+    var trapWidth = 200;
+    var trapHeight = 200;
+    return [this.x,
+            this.y,
+            this.x + trapWidth,
+            this.y + trapHeight];
+}
 
 Trap.prototype.move = function(delta){
 	if(this.isActive){
