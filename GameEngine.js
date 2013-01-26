@@ -36,7 +36,8 @@ function GameEngine(canvas){
     this.__unit_counter = 0;
     this.__debugEnabled = false;
 
-    this.myTick = this.tick.bind(this);
+    // this.myTick = this.tick.bind(this);
+    this.timer = new Timer();
 }
 
 
@@ -63,7 +64,7 @@ GameEngine.prototype.init = function(canvas){
         var x = GAME_WIDTH/2, y = GAME_HEIGHT/2;
         var hero_sprite = that.assetManager.getAsset("sprite/test.png");
 
-        that.context.drawImage(hero_sprite,x-sprite.width/2,y-sprite.height/2);
+        that.context.drawImage(hero_sprite,x-hero_sprite.width/2,y-hero_sprite.height/2);
     });
 };
 
@@ -158,21 +159,21 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
 
 // Start/Resume game animation.
 GameEngine.prototype.start = function(){
+    var that = this;
     if(this.gamePaused){
         this.gamePaused = false;
         this.gameState = GameEngineStates.RUNNING;
-        var date = new Date();
-        var time = date.getTime();
-        this.tick(time);
+        (function gameloop(){
+            that.tick();
+            requestAnimationFrame(gameloop,that.canvas);
+        })();
     }
 };
 
 
 
-GameEngine.prototype.tick = function tick(lastTime){
-    var date = new Date();
-    var time = date.getTime();
-    var delta = time - lastTime;
+GameEngine.prototype.tick = function tick(){
+    var delta = this.timer.tick();
     
     // we're only using .gameSpeed as a "debug" feature
     // at this stage.
@@ -191,9 +192,9 @@ GameEngine.prototype.tick = function tick(lastTime){
     }
     
     //Call function again
-    if(!this.gamePaused){
-        window.setTimeout(this.myTick, 10, time);
-    }
+    // if(!this.gamePaused){
+    //     window.setTimeout(this.myTick, 10, time);
+    // }
 };
 
 
@@ -764,3 +765,19 @@ GameEngine.prototype.canvasMouseMove = function(ev){
     this.mouseX = ev.x - offset.left;
     this.mouseY = ev.y - offset.top;
 };
+
+function Timer(){
+    this.gameTime = 0;
+    this.maxStep = 0.05;
+    this.wallLastTimestamp = 0;
+}
+
+Timer.prototype.tick = function(){
+    var wallCurrent = Date.now();
+    var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
+
+    var gameDelta = Math.min(wallDelta, this.maxStep);
+    this.gameTime += gameDelta;
+    this.wallLastTimestamp = wallCurrent;
+    return gameDelta;
+}
