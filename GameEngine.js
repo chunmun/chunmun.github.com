@@ -187,7 +187,7 @@ GameEngine.prototype.spawnTraps = function(){
        scale : 0.2,
        animation : trap_animation
     });
-    trap.activate();
+    trap.deactivate();
     this.gameObjects.push(trap);
     this.traps.push(trap);
     console.log(this.traps);
@@ -548,7 +548,7 @@ GameEngine.prototype.ensureWithinBounds = function(obj){
 Control the Hero's movement with the keypresses
 */
 GameEngine.prototype.handlePlayerInput = function(delta){
-   // Keycode: 37 Left , 38 Up, 39 Right, 40 Down
+   // Keycode: 37 Left , 38 Up, 39 Right, 40 Down, 32 Space
 
    if(this.keysPressed[37] && !this.keysPressed[39]){
      // console.log("Going Left");
@@ -566,8 +566,23 @@ GameEngine.prototype.handlePlayerInput = function(delta){
      // console.log("Going Down");
      this.hero.moveDown(delta);
    }
+   if(this.keysPressed[32]){
+     this.__checkTrapActivation();
+   }
 };
 
+
+
+GameEngine.prototype.__checkTrapActivation = function(){
+    var h = this.hero;
+    var close_traps = this.traps.filter(function(trap){return ((h.getDistanceToUnit(trap)<50 && !trap.isActive)?true:false);});
+    if(close_traps.length>1){
+        console.log("This shouldn't be happening. Hero is too close to 2 traps");
+    }
+    if(close_traps[0]){
+        close_traps[0].activate();
+    }
+}
 
 
 GameEngine.prototype.__debugFocusNextUnit = function(){
@@ -693,13 +708,32 @@ GameEngine.prototype.render = function(ctx){
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
      
-    // Draw (Renderable) Units
-    for(var i = 0; i < this.gameObjects.length; i++){
-        if(this.gameObjects[i]){
-            this.gameObjects[i].render(ctx);
+    // Draw traps
+    var MAX_LOS = 150;
+    for(var i = 0; i < this.traps.length; i++){
+        if(this.traps[i]){
+            var dist = this.hero.getDistanceToUnit(this.traps[i]);
+            if(this.traps[i].isActive){
+                this.traps[i].render(ctx);
+            } else {
+                if(dist<MAX_LOS){
+                    this.gameObjects[i].setVisibility((MAX_LOS-dist)/MAX_LOS);
+                    this.gameObjects[i].render(ctx);
+                } else {
+                    // Don't render them
+                }
+            }
         }
     }
-   
+
+    // Draw the monsters
+    for(var i = 0; i < this.monsters.length; i++){
+        this.monsters[i].render(ctx);
+    }
+
+
+    // Draw the hero 
+    this.hero.render(ctx);
     
     //
     // Text rendering
