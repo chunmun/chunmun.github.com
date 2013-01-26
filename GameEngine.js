@@ -162,13 +162,23 @@ GameEngine.prototype.spawnMonsters = function(){
     console.log('Spawning Monsters');
     var that = this;
 
+    // Spawn the monster near a 'carrot', which is map
+    var path = this.map.paths[Math.floor(Math.random() * this.map.paths.length)];
+    var ct = Math.random();
+    var cpt = Geometry.evaluateCurve(path.curve, ct);
+    var carrot = {pt: cpt,
+                  speed: 0,
+                  t: ct,
+                  path: path};
+    
     var DEFAULT_MONSTER_ARGS = {
         id:0, 
-        x:GAME_WIDTH/2, 
-        y:GAME_HEIGHT/2, 
+        x:cpt[0], 
+        y:cpt[1], 
         visibility:1, 
         damage:0, 
-        scale:0.3, 
+        scale:0.3,
+        carrot: carrot,
         spriteSheet:(function(){
             var monster_sprite = that.assetManager.getAsset("sprite/Monster 1 complete Sprite.png");
             var monster_ss = new SpriteSheet({
@@ -743,6 +753,7 @@ GameEngine.prototype.render = function(ctx){
     ctx.fillStyle = "#AFAFAF";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
+    this.map.renderMapPathData(ctx);
      
     // Draw traps
     var MAX_LOS = 150;

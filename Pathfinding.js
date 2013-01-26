@@ -27,7 +27,7 @@ function Path(args){
 
 
 
-Path.prototype.updateAICarrot = function(carrot){
+function updateAICarrot(carrot){
     /*
       Move the carrot (the thing the AI chases) further along the path;
       
@@ -43,7 +43,7 @@ Path.prototype.updateAICarrot = function(carrot){
     }
     
     var t = carrot.t;
-    var dt = carrot.speed / this.length; // Normalise distance moved on the path
+    var dt = carrot.speed / carrot.path.length; // Normalise distance moved on the path
     
     if(dt > 1){
         throw "This is far too fast for what I expect.";
@@ -52,7 +52,7 @@ Path.prototype.updateAICarrot = function(carrot){
     if(carrot.t + dt > 1){
         // t+dt is greater than one; we need to select another path.
         // Select the next path randomly.
-        var nextPaths = this.wpEnd.adjacentPaths;
+        var nextPaths = carrot.path.wpEnd.adjacentPaths;
         var rnd = Math.floor(Math.random() * nextPaths.length);
         var nextPath = nextPaths[rnd];
         
