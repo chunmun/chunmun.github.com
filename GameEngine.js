@@ -27,6 +27,7 @@ function GameEngine(canvas){
     // TODO need map initialisation
 
     this.hero = new Hero(); // TODO need initialisation
+    this.map = createDefaultMap();
     this.monsters = [];
     this.traps = [];
 
@@ -61,7 +62,11 @@ GameEngine.prototype.init = function(canvas){
     // load the image assets
     this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
     this.assetManager.queueDownload("sprite/hero.png");
+	this.assetManager.queueDownload("sprite/Monster 1 Sprite.png");
     this.assetManager.downloadAll(function(){});
+	
+	// add the monster
+	this.spawnMonsters();
 
     // add the traps
     this.spawnTraps();
@@ -154,6 +159,44 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
     this.__updateFocusComboBox();
 };
 
+//Hans
+GameEngine.prototype.spawnMonsters = function(){
+	console.log('Spawning Monsters');
+	var that = this;
+	var monster_side_sprite = that.assetManager.getAsset("sprite/Monster 1 Sprite.png");
+	var monster_side_ss = new SpriteSheet({
+		image:monster_side_sprite,
+		width:200,
+		height:200,
+		sprites:[{name:'neutral'},{name:'move1'},{name:'move2'},{name:'move3'}]});
+	var monster_side_animation = new Animation({
+		spriteSheet:monster_side_ss,
+		animation:[{spriteName: 'neutral', length:0.2},
+					{spriteName: 'move1', length:0.2},
+					{spriteName: 'move2', length:0.1},
+					{spriteName: 'move3', length:0.2}],
+		repeat:true,
+		keyFrame:0
+	});
+	
+	var monster = new Monster({
+		id : 'monster1 side',
+		x : GAME_WIDTH/2,
+		y : GAME_HEIGHT/2,
+		speed : 1,
+		max_speed : 2,
+		visibility : 1,
+		damage : 10,
+		prevX : GAME_WIDTH/2,
+		prevY : GAME_HEIGHT/2,
+		animation : monster_side_animation
+    });
+	monster.activate();
+	this.gameObjects.push(monster);
+	this.monsters.push(monster);
+	console.log(this.monsters);
+	console.log("Finished spawning monster");
+}
 
 
 GameEngine.prototype.spawnTraps = function(){
@@ -319,12 +362,12 @@ GameEngine.prototype.move = function(delta){
     this.__moveBullets(delta);
 
     // Move Monsters
-    this.monsters.forEach(function(monsters){
-        do_monster_move(delta, zombie, this.cityMap, inflrs);
+    this.monsters.forEach(function(monster){
+        monster.move(delta, monster, this.map);
     }.bind(this));
 
     // Remove dead monsters
-    var expiredMonsters = this.monsters.filter(function(monsters){
+    var expiredMonsters = this.monsters.filter(function(monster){
         return monster.isExpired();
     });
     expiredMonsters.forEach(function(monster){
@@ -346,14 +389,13 @@ GameEngine.prototype.move = function(delta){
 
 
 GameEngine.prototype.__checkCollisions = function(){
-    return; // TODO 
     /*
       The idea is that we check for collisions only
        for units which are 'close' to each other by
        dividing the map into grid squares.
     */
 
-    var grid_width = 30;
+    var grid_width = 250;
     var grid_height = grid_width;
     
     var num_bucket_cols = Math.ceil(GAME_WIDTH / grid_width);
@@ -434,42 +476,42 @@ GameEngine.prototype.__checkCollisionsNaive = function(){
 
 
 GameEngine.prototype.handleCollision = function(obj1, obj2){
-   // Resolve collision between Hero, Monster and traps
-   // Monster damages HERO
-   if(obj1 instanceof Monster){
-     if(obj2 instanceof Monster){
-       // Monster-monster do nothing 
-       // Might want to do collision for them
-     }else if(obj2 instanceof Trap){
-        // Monster-Trap
-        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
-     }else{
-        // Monster-Hero
-        obj2.setHealth(obj2.getHealth()-obj1.getDamage());
-     }
-   }else if(obj1 instanceof Trap){
-     if(obj2 instanceof Monster){
-       // Trap-Monster
-       obj2.setHealth(obj2.getHeath()-obj1.getDamage());
-     }else if(obj2 instanceof Trap){
-        // Trap-Trap
-        // This shld not happen
-     }else{
-        // Trap-Hero
-        // Nothing should happen
-     }
-   }else{
-     if(obj2 instanceof Monster){
-        // Hero-Monster
-        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
-     }else if(obj2 instanceof Trap){
-        // Hero-Trap
-        // Nothing should happen
-     }else{
-        // Hero-Hero
-        // This shld not happen
-     }
-   }
+    // Resolve collision between Hero, Monster and traps
+    // Monster damages HERO
+    if(obj1 instanceof Monster){
+        if(obj2 instanceof Monster){
+            // Monster-monster do nothing 
+            // Might want to do collision for them
+        }else if(obj2 instanceof Trap){
+            // Monster-Trap
+            obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+        }else{
+            // Monster-Hero
+            obj2.setHealth(obj2.getHealth()-obj1.getDamage());
+        }
+    }else if(obj1 instanceof Trap){
+        if(obj2 instanceof Monster){
+            // Trap-Monster
+            obj2.setHealth(obj2.getHeath()-obj1.getDamage());
+        }else if(obj2 instanceof Trap){
+            // Trap-Trap
+            // This shld not happen
+        }else{
+            // Trap-Hero
+            // Nothing should happen
+        }
+    }else{
+        if(obj2 instanceof Monster){
+            // Hero-Monster
+            obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+        }else if(obj2 instanceof Trap){
+            // Hero-Trap
+            // Nothing should happen
+        }else{
+            // Hero-Hero
+            // This shld not happen
+        }
+    }
 };
 
 
@@ -705,7 +747,9 @@ GameEngine.prototype.render = function(ctx){
     // Fill Background, and CityMap/Roads
     ctx.fillStyle = "#AFAFAF";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    //this.cityMap.render(ctx);
+    
+    // Render paths, for debugging purposes.
+    this.map.renderMapPathData(ctx);
      
     // Draw traps
     var MAX_LOS = 150;

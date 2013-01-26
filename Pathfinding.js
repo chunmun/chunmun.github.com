@@ -18,16 +18,16 @@ function Path(args){
     this.curve = args.curve;
     
     // Regsiter ourselfs with the waypoints.
-    wpStart.adjacentPaths.push(this);
-    wpEnd.adjacentPaths.push(this);
+    args.wpStart.adjacentPaths.push(this);
+    args.wpEnd.adjacentPaths.push(this);
     
     // Approximate the length of the Path from the curve.
-    this.length = Geometry.estimateLength(curve, 100);
+    this.length = Geometry.estimateLength(args.curve, 100);
 }
 
 
 
-Path.prototype.updateAICarrot(carrot){
+Path.prototype.updateAICarrot = function(carrot){
     /*
       Move the carrot (the thing the AI chases) further along the path;
       
