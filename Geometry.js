@@ -235,7 +235,7 @@ var Geometry = (function(){
         for(var i = 1; i <= k; i++){
             currPt = evaluateCurve(i / k);
             
-            result += magnitude(sub(prevPt, currPt));
+            result += magnitude(sub(currPt, prevPt));
             
             prevPt = currPt;
         }

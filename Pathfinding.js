@@ -19,7 +19,7 @@ function Path(args){
     
     // Regsiter ourselfs with the waypoints.
     args.wpStart.adjacentPaths.push(this);
-    args.wpEnd.adjacentPaths.push(this);
+    //args.wpEnd.adjacentPaths.push(this);
     
     // Approximate the length of the Path from the curve.
     this.length = Geometry.estimateLength(args.curve, 100);

@@ -82,7 +82,8 @@ function createDefaultMap(){
     var cp4 = [mapWidth - 50, mapHeight - 50]; // botright
     
     var bc1 = [wpt2, cp1, cp2, wpt1]; // ccw order
-    var bc2 = [wpt1, cp3, cp4, wpt2]; // ccw order
+    //var bc2 = [wpt1, cp3, cp4, wpt2]; // ccw order
+    var bc2 = [wpt2, cp4, cp3, wpt1]; // ccw order
     
     var path1 = new Path({wpStart: wp1,
                          wpEnd: wp2,
