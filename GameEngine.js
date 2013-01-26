@@ -10,7 +10,7 @@ var MAX_MONSTER_COUNT = 10;
 var DEFAULT_HERO_ARGS = {id:0, x:GAME_WIDTH/2, y:GAME_HEIGHT/2, visibility:1, damage:0, polyCoords:[]};
 
 var MAX_DELTA = 0.05;
-var DEBUG_SHOW_FRAMERATE = true;
+var DEBUG_SHOW_FRAMERATE = !true;
 
 /**
 * An object to look after game animation/movement.
@@ -700,7 +700,6 @@ GameEngine.prototype.render = function(ctx){
     // Fill Background, and CityMap/Roads
     ctx.fillStyle = "#AFAFAF";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    //this.cityMap.render(ctx);
     
     // Render paths, for debugging purposes.
     this.map.renderMapPathData(ctx);
@@ -722,7 +721,7 @@ GameEngine.prototype.render = function(ctx){
     var oldTextAlign = context.textAlign;
     
     // Render framerate, if needed.
-    if(!DEBUG_SHOW_FRAMERATE){
+    if(DEBUG_SHOW_FRAMERATE){
         context.font = 'italic 13px Arial';
         context.fillStyle = 'white';
         context.textAlign = 'left';
