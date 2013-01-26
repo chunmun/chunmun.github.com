@@ -3,28 +3,18 @@
     <head>
 		<!-- Game Dependencies -->
         <script src="Geometry.js" ></script>
-        <script src="MovingObject.js" ></script>
-        <script src="RenderablePolygon.js" ></script>
-        <script src="CityMap.js" ></script>
-        <script src="GameUnits.js" ></script>
-        <script src="ZombieAI.js" ></script>
-        <script src="CivilianAI.js" ></script>
-        <script src="SoldierAI.js" ></script>
-        <script src="Influencers.js" ></script>
+        <script src="GameObject.js" ></script>
+        <script src="GameUnits.js" > </script>
         <script src="SFX.js" ></script>
         <script src="GameEngine.js" ></script>
         <script>
             var GE; //Game engine Global variable
-            var GAME_WIDTH = 640;
-            var GAME_HEIGHT = 480;
-            
-            
             
             window.onload = function() {
 	        // Create a new GameEngine tied to a specific HTML5 Canvas.
                 canvas = document.getElementById("gameCanvas");
                 context = canvas.getContext("2d");
-                
+ 
                 GE = new GameEngine(canvas);
                 GE.init(canvas);
                 GE.newGame();
@@ -36,13 +26,13 @@
     <body>
         <table width="100%">
             <tr>
-                <td colspan="2" align="center"><h3>JS-Zombies</h3></td>
+                <td colspan="2" align="center"><h3>GGJ2013-Deborah</h3></td>
             </tr>
 			
             <tr>
                 <td width="650" valign="top">
                     <!-- Game canvas -->
-                    <canvas id="gameCanvas" width="640" height="480"></canvas>
+                    <canvas id="gameCanvas" width="640" height="480" tabindex="1"></canvas>
                 </td>
                 
 				

@@ -30,7 +30,6 @@ function GameObject(args){
 }
 
 
-
 GameObject.prototype.getDistanceTo = function(x, y) {
     function square(x){ return x * x; };
     return Math.sqrt(square(this.x - x) + square(this.y - y));

@@ -3,7 +3,11 @@ var GameEngineStates = {PAUSED:  0,
                         LOST:    2,
                         WON:     4};
 
+var GAME_HEIGHT = 640;
+var GAME_WIDTH = 480;
+
 var MAX_MONSTER_COUNT = 10;
+var DEFAULT_HERO_ARGS = {id:0, x:GAME_WIDTH/2, y:GAME_HEIGHT/2, visibility:1, damage:0, polyCoords:[]};
 
 var DEBUG_SHOW_FRAMERATE = true;
 
@@ -21,7 +25,7 @@ function GameEngine(canvas){
 
     // TODO need map initialisation
 
-    this.hero = new Hero(); // TODO need initialisation
+    this.hero = new Hero(DEFAULT_HERO_ARGS); // TODO need initialisation
     this.monsters = [];
     this.traps = [];
 
@@ -132,10 +136,10 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
     //     this.civilians.push(civ);
     //     this.movable.push(civ);
     //     this.renderable.push(civ);
-    // }
+    }
     
     this.__updateFocusComboBox();
-}
+};
 
 
 
@@ -188,15 +192,15 @@ GameEngine.prototype.tick = function tick(lastTime){
 */
 GameEngine.prototype.__checkGameTerminationConditions = function(){
     // The game is won if there are no more monsters
-    if(this.monsters.length === 0){
-        this.gameState = GameEngineStates.WON;
-    }
+    // if(this.monsters.length === 0){
+    //     this.gameState = GameEngineStates.WON;
+    // }
     
     // The game is lost if the hero has no more health 
     if(this.hero.getHealth() <= 0){
         this.gameState = GameEngineStates.LOST;
     }
-}
+};
 
 
 
@@ -231,7 +235,7 @@ GameEngine.prototype.__moveBullets = function(delta){
  O(n^2)
 */
 GameEngine.prototype.move = function(delta){
-    this.handlePlayerInput();
+    this.handlePlayerInput(delta);
     this.__moveBullets(delta);
 
     // Move Monsters
@@ -311,7 +315,7 @@ GameEngine.prototype.__checkCollisions = function(){
             this.__checkCollisionsInArray(arr[i][j]);
         }
     }
-}
+};
 
 
 
@@ -397,7 +401,7 @@ GameEngine.prototype.destroyObject = function(movingObj){
     // before we remove it from the game. (e.g. drop an item).
 
     this.removeObject(movingObj);
-}
+};
 
 
 
@@ -458,15 +462,28 @@ GameEngine.prototype.ensureWithinBounds = function(obj){
 };
 
 
+/*
+Control the Hero's movement with the keypresses
+*/
+GameEngine.prototype.handlePlayerInput = function(delta){
+   // Keycode: 37 Left , 38 Up, 39 Right, 40 Down
 
-GameEngine.prototype.handlePlayerInput = function(){
-    // Do stuff in the game using the functions
-    // like isKeyPressed
-    
-    if(this.currentInfluencer){
-        this.currentInfluencer.x = this.mouseX;
-        this.currentInfluencer.y = this.mouseY;
-    }
+   if(this.keysPressed[37] && !this.keysPressed[39]){
+     // console.log("Going Left");
+     this.Hero.moveLeft(delta);
+   }
+   if(!this.keysPressed[37] && this.keysPressed[39]){
+     console.log("Going Right");
+     this.Hero.moveRight(delta);
+   }
+   if(this.keysPressed[38] && !this.keysPressed[40]){
+     console.log("Going Up");
+     this.Hero.moveUp(delta);
+   }
+   if(!this.keysPressed[38] && this.keysPressed[40]){
+     console.log("Going Down");
+     this.Hero.moveDown(delta);
+   }
 };
 
 
@@ -573,12 +590,12 @@ GameEngine.prototype.__updateFocusComboBox = function(){
     } else {
         debugCameraUnitFocus_div.getElementsByClassName("ui-combobox-input")[0].value = "None";
     }
-}
+};
 
 
 
 GameEngine.prototype.updateUI = function(){
-}
+};
 
 
 
@@ -669,14 +686,14 @@ GameEngine.prototype.renderDebugCanvas = function (ctx){
     
     this.render(ctx);
     ctx.restore();
-}
-
+};
 
 
 // Record key press
 GameEngine.prototype.keydown = function(evt){
     var keyCode = (window.event) ? event.keyCode : evt.keyCode;
     this.keysPressed[keyCode] = true;
+    evt.preventDefault(); // Prevents the window from scrolling. Seems to only work in Chrome
 };
 
 
@@ -685,6 +702,7 @@ GameEngine.prototype.keydown = function(evt){
 GameEngine.prototype.keyup = function(evt){
     var keyCode = (window.event) ? event.keyCode : evt.keyCode;
     this.keysPressed[keyCode] = false;
+    evt.preventDefault(); // Prevents the window from scrolling. Seems to only work in Chrome
 };
 
 
@@ -697,22 +715,22 @@ GameEngine.prototype.isKeyPressed = function(keyCode){
 
 
 GameEngine.prototype.canvasMouseDown = function(ev){
-    if(this.currentInfluencer){
-        // Make smoke emitter
-        var x = this.currentInfluencer.x;
-        var y = this.currentInfluencer.y;
-        var duration = this.currentInfluencer.duration;
-        var smokeEmitter = new SmokeEmitter({x: x,
-                                             y: y,
-                                             emitFrequency: 30,
-                                             duration: duration * 1.5});
-        this.smokeEmitters.push(smokeEmitter);
+    // if(this.currentInfluencer){
+    //     // Make smoke emitter
+    //     var x = this.currentInfluencer.x;
+    //     var y = this.currentInfluencer.y;
+    //     var duration = this.currentInfluencer.duration;
+    //     var smokeEmitter = new SmokeEmitter({x: x,
+    //                                          y: y,
+    //                                          emitFrequency: 30,
+    //                                          duration: duration * 1.5});
+    //     this.smokeEmitters.push(smokeEmitter);
         
-        this.placedInfluencers.push(this.currentInfluencer);
-        this.currentInfluencer.t = 0; // reset counter, if it was used.
-        this.currentInfluencer = null;
-    }
-}
+    //     this.placedInfluencers.push(this.currentInfluencer);
+    //     this.currentInfluencer.t = 0; // reset counter, if it was used.
+    //     this.currentInfluencer = null;
+    // }
+};
 
 
 
@@ -734,4 +752,4 @@ GameEngine.prototype.canvasMouseMove = function(ev){
     
     this.mouseX = ev.x - offset.left;
     this.mouseY = ev.y - offset.top;
-}
+};

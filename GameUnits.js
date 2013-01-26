@@ -11,7 +11,7 @@ var HEALTH_MONSTER = 50;
 /*
 Augment GameObject with Hero characteristics
 */
-function Hero = function(args){
+function Hero(args){
 	if(!args){
 		return;
 	}	
@@ -28,7 +28,7 @@ Hero.prototype = new GameObject();
 /*
 Augment GameObject with Monster characteristics
 */
-function Monster = function(args){
+function Monster(args){
 	if(!args){
 		return;
 	}
@@ -45,7 +45,7 @@ Monster.prototype = new GameObject();
 /*
 Augment GameObject with Trap characteristics
 */
-function Trap = function(args){
+function Trap(args){
 	if(!args){
 		return;
 	}

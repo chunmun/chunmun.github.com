@@ -103,7 +103,7 @@ SmokeEmitter.prototype.render = function(ctx){
 
 
 function SmokeParticle(args){
-    MovingObject.call(this, args);
+    GameObject.call(this, args);
     
     this.radius = args.radius || 15;
     this.fillColor = args.fillColor || "#008800";
@@ -117,7 +117,7 @@ function SmokeParticle(args){
         throw new "Invalid Particle duration!";
     }
 };
-SmokeParticle.prototype = new MovingObject();
+SmokeParticle.prototype = new GameObject();
 
 
 
