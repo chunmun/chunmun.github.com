@@ -119,7 +119,35 @@ function Monster(args){
 	this.speed = args.speed || SPEED_MONSTER;
 	this.isActive = false;
 	
-	this.spriteAnimation = args.animation || null;
+	this.scale = args.scale;
+	this.spriteSheet = args.spriteSheet;
+	this.upAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"up1",length:0.1},{spriteName:"up2",length:0.1},{spriteName:"up3",length:0.1},{spriteName:"up4",length:0.1}],
+		repeat:true,
+		keyframe:0
+	});
+
+	this.downAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"dn1",length:0.1},{spriteName:"dn2",length:0.1},{spriteName:"dn3",length:0.1},{spriteName:"dn4",length:0.1}],
+		repeat:true,
+		keyframe:0
+	});
+
+	this.leftAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"lf1",length:0.1},{spriteName:"lf2",length:0.1},{spriteName:"lf3",length:0.1},{spriteName:"lf4",length:0.1}],
+		repeat:true,
+		keyframe:0
+	});
+
+	this.rightAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"rg1",length:0.1},{spriteName:"rg2",length:0.1},{spriteName:"rg3",length:0.1},{spriteName:"rg4",length:0.1}],
+		repeat:true,
+		keyframe:0
+	});
 }
 
 Monster.prototype = new GameObject();
@@ -136,16 +164,45 @@ Monster.prototype.getBoundingBox = function(){
 //Hans
 Monster.prototype.move = function(delta){
 	if(this.isActive){
-		this.spriteAnimation.update(delta);
+		this.leftAnimation.update(delta);
+		this.rightAnimation.update(delta);
+		this.upAnimation.update(delta);
+		this.downAnimation.update(delta);
 	}
 }
 
+// Monster.prototype.render = function(ctx){
+// 	if(!this.isActive){
+// 		// Monster has not been activated
+// 		this.spriteAnimation.reset();
+// 	}
+// 	this.spriteAnimation.render(ctx,this.x,this.y,1,this.visibility);
+// }
+
 Monster.prototype.render = function(ctx){
-	if(!this.isActive){
-		// Monster has not been activated
-		this.spriteAnimation.reset();
+	// console.log((this.getPreviousX()-this.getX())+':'+this.getX());
+	if(this.getPreviousX()>this.getX()){
+		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		this.setX(this.getX());
+		return;
+	} else if(this.getPreviousX()<this.getX()){
+		this.rightAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		this.setX(this.getX());
+		return;
+	} else if(this.getPreviousY()<this.getY()){
+		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		this.setY(this.getY());
+		return;
+	} else if(this.getPreviousY()>this.getY()){
+		this.upAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);		
+		this.setY(this.getY());
+		return;
+	} else {
+		this.downAnimation.reset();
+		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		return;
 	}
-	this.spriteAnimation.render(ctx,this.x,this.y,1,this.visibility);
+
 }
 
 Monster.prototype.canDealDamage = function(){

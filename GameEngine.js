@@ -62,12 +62,13 @@ GameEngine.prototype.init = function(canvas){
     // load the image assets
     this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
     this.assetManager.queueDownload("sprite/hero.png");
-	this.assetManager.queueDownload("sprite/Monster 1 Sprite.png");
+	this.assetManager.queueDownload("sprite/Monster 1 complete Sprite.png");
     this.assetManager.downloadAll(function(){});
 
     // add the traps
     this.spawnTraps();
     this.spawnHero();
+    this.spawnMonsters();
 };
 
 
@@ -160,36 +161,33 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
 GameEngine.prototype.spawnMonsters = function(){
     console.log('Spawning Monsters');
     var that = this;
-    var monster_side_sprite = that.assetManager.getAsset("sprite/Monster 1 Sprite.png");
-    var monster_side_ss = new SpriteSheet({
-        image:monster_side_sprite,
-        width:200,
-        height:200,
-        sprites:[{name:'neutral'},{name:'move1'},{name:'move2'},{name:'move3'}]});
-    var monster_side_animation = new Animation({
-        spriteSheet:monster_side_ss,
-        animation:[{spriteName: 'neutral', length:0.2},
-                    {spriteName: 'move1', length:0.2},
-                    {spriteName: 'move2', length:0.1},
-                    {spriteName: 'move3', length:0.2}],
-        repeat:true,
-        keyFrame:0
-    });
-    
-    var monster = new Monster({
-        id : 'monster1 side',
-        x : GAME_WIDTH/2,
-        y : GAME_HEIGHT/2,
-        speed : 1,
-        max_speed : 2,
-        visibility : 1,
-        damage : 10,
-        prevX : GAME_WIDTH/2,
-        prevY : GAME_HEIGHT/2,
-        animation : monster_side_animation
-    });
+
+    var DEFAULT_MONSTER_ARGS = {
+        id:0, 
+        x:GAME_WIDTH/2, 
+        y:GAME_HEIGHT/2, 
+        visibility:1, 
+        damage:0, 
+        scale:0.3, 
+        spriteSheet:(function(){
+            var monster_sprite = that.assetManager.getAsset("sprite/Monster 1 complete Sprite.png");
+            var monster_ss = new SpriteSheet({
+                image:monster_sprite,
+                width:200,
+                height:200,
+                cols:4,
+                rows:4,
+                sprites:[{name:'up1'},{name:'up2'},{name:'up3'},{name:'up4'},
+                         {name:'dn1'},{name:'dn2'},{name:'dn3'},{name:'dn4'},
+                         {name:'lf1'},{name:'lf2'},{name:'lf3'},{name:'lf4'},
+                         {name:'rg1'},{name:'rg2'},{name:'rg3'},{name:'rg4'}]});
+            return monster_ss;
+        })()
+    };
+
+    var monster = new Monster(DEFAULT_MONSTER_ARGS);
+    that.gameObjects.push(monster);
     monster.activate();
-    this.gameObjects.push(monster);
     this.monsters.push(monster);
     console.log(this.monsters);
     console.log("Finished spawning monster");
@@ -358,12 +356,12 @@ GameEngine.prototype.move = function(delta){
     this.__moveBullets(delta);
 
     // Move Monsters
-    this.monsters.forEach(function(monsters){
-        do_monster_move(delta, zombie, this.cityMap, inflrs);
+    this.monsters.forEach(function(monster){
+        monster.move(delta, monster, this.map);
     }.bind(this));
 
     // Remove dead monsters
-    var expiredMonsters = this.monsters.filter(function(monsters){
+    var expiredMonsters = this.monsters.filter(function(monster){
         return monster.isExpired();
     });
     expiredMonsters.forEach(function(monster){
