@@ -25,28 +25,28 @@ function Hero(args){
 	this.spriteSheet = args.spriteSheet;
 	this.upAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"up1",length:0.1},{spriteName:"up2",length:0.1},{spriteName:"up3",length:0.1},{spriteName:"up4",length:0.1}],
+		animation:[{spriteName:"up1",length:0.1},{spriteName:"up2",length:0.1},{spriteName:"up3",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
 
 	this.downAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"dn1",length:0.1},{spriteName:"dn2",length:0.1},{spriteName:"dn3",length:0.1},{spriteName:"dn4",length:0.1}],
+		animation:[{spriteName:"dn1",length:0.1},{spriteName:"dn2",length:0.1},{spriteName:"dn3",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
 
 	this.leftAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"lf1",length:0.1},{spriteName:"lf2",length:0.1},{spriteName:"lf3",length:0.1},{spriteName:"lf4",length:0.1}],
+		animation:[{spriteName:"lf1",length:0.1},{spriteName:"lf2",length:0.1},{spriteName:"lf3",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
 
 	this.rightAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
-		animation:[{spriteName:"rg1",length:0.1},{spriteName:"rg2",length:0.1},{spriteName:"rg3",length:0.1},{spriteName:"rg4",length:0.1}],
+		animation:[{spriteName:"rg1",length:0.1},{spriteName:"rg2",length:0.1},{spriteName:"rg3",length:0.1}],
 		repeat:true,
 		keyframe:0
 	});
@@ -200,21 +200,22 @@ Monster.prototype.move = function(delta,hero){
 // }
 
 Monster.prototype.render = function(ctx){
-    // Render carrot
-    ctx.beginPath();
-    var cpt = this.carrot.pt;
-    context.arc(cpt[0], cpt[1], 5, 0, 2 * Math.PI, false);
-    context.lineWidth = 2;
-    context.strokeStyle = '#0000FF';
-    context.stroke();
+	//////////////////////////////////////////////////////////////////////////////////   TO RENDER CARROT
+    // // Render carrot
+    // ctx.beginPath();
+    // var cpt = this.carrot.pt;
+    // context.arc(cpt[0], cpt[1], 5, 0, 2 * Math.PI, false);
+    // context.lineWidth = 2;
+    // context.strokeStyle = '#0000FF';
+    // context.stroke();
     
     
-    // Render carrot
-    ctx.beginPath();
-    context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
-    context.lineWidth = 2;
-    context.strokeStyle = '#000000';
-    context.stroke();
+    // // Render carrot
+    // ctx.beginPath();
+    // context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+    // context.lineWidth = 2;
+    // context.strokeStyle = '#000000';
+    // context.stroke();
     
     
 

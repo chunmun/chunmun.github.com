@@ -65,7 +65,7 @@ GameEngine.prototype.init = function(canvas){
 
     // load the image assets
     this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
-    this.assetManager.queueDownload("sprite/hero.png");
+    this.assetManager.queueDownload("sprite/Hero sprites.png");
 	this.assetManager.queueDownload("sprite/Monster 1 complete Sprite.png");
 	this.assetManager.queueDownload("sprite/Monster 1 Sprite.png");
     this.assetManager.queueDownload("sprite/Dungeonbg.png");
@@ -189,7 +189,7 @@ GameEngine.prototype.spawnMonsters = function(){
         x:cpt[0], 
         y:cpt[1], 
         visibility:1, 
-        damage:30, 
+        damage:5, 
         scale:0.3,
         carrot: carrot,
         spriteSheet:(function(){
@@ -298,17 +298,17 @@ GameEngine.prototype.spawnHero = function(){
         damage:0, 
         scale:0.3, 
         spriteSheet:(function(){
-            var hero_sprite = that.assetManager.getAsset("sprite/hero.png");
+            var hero_sprite = that.assetManager.getAsset("sprite/Hero sprites.png");
             var hero_ss = new SpriteSheet({
                 image:hero_sprite,
                 width:200,
                 height:200,
-                cols:4,
+                cols:3,
                 rows:4,
-                sprites:[{name:'up1'},{name:'up2'},{name:'up3'},{name:'up4'},
-                         {name:'dn1'},{name:'dn2'},{name:'dn3'},{name:'dn4'},
-                         {name:'lf1'},{name:'lf2'},{name:'lf3'},{name:'lf4'},
-                         {name:'rg1'},{name:'rg2'},{name:'rg3'},{name:'rg4'}]});
+                sprites:[{name:'up1'},{name:'up2'},{name:'up3'},
+                         {name:'dn1'},{name:'dn2'},{name:'dn3'},
+                         {name:'lf1'},{name:'lf2'},{name:'lf3'},
+                         {name:'rg1'},{name:'rg2'},{name:'rg3'}]});
             return hero_ss;
         })()
     };
@@ -800,7 +800,8 @@ GameEngine.prototype.render = function(ctx){
     // ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     //this.cityMap.render(ctx);
-    this.map.renderMapPathData(ctx);
+    //////////////////////////////////////////////////////////////////////////                                TO SHOW PATH
+    //this.map.renderMapPathData(ctx);
      
     // Draw traps
     var MAX_LOS = 150;
