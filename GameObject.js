@@ -243,3 +243,8 @@ GameObject.prototype.equals = function (o){
     
     return true;
 };
+
+
+GameObject.prototype.isExpired = function() {
+    return this.health<=0;
+};
