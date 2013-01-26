@@ -51,7 +51,7 @@ GameObject.prototype.getDistanceToUnit = function(unit) {
 
 GameObject.prototype.move = function(delta){
     //console.log("parent move " + x + "," + y + "," + speed + "," + speedAngle);
-    var k = delta / 1000;
+    var k = delta;
     
     //console.log("move: " + x + "," + y + "," + speedAngle + "," + speed + "," + k);
     this.setX(this.x + Math.cos(this.speedAngle) * this.speed * k);

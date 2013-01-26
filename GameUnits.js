@@ -121,6 +121,9 @@ function Monster(args){
 	
 	this.scale = args.scale;
 	this.spriteSheet = args.spriteSheet;
+    
+    this.carrot = args.carrot;
+    
 	this.upAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
 		animation:[{spriteName:"up1",length:0.1},{spriteName:"up2",length:0.1},{spriteName:"up3",length:0.1},{spriteName:"up4",length:0.1}],
@@ -168,6 +171,17 @@ Monster.prototype.move = function(delta){
 		this.rightAnimation.update(delta);
 		this.upAnimation.update(delta);
 		this.downAnimation.update(delta);
+        
+        this.carrot.speed = this.speed * delta;
+        updateAICarrot(this.carrot);
+        
+        var cpt = this.carrot.pt;
+        var dx = cpt[0] - this.x;
+        var dy = cpt[1] - this.y;
+        
+        var theta = Math.atan2(-dy, dx);
+        this.setMoveAngle(theta);
+        GameObject.prototype.move.call(this, delta);
 	}
 }
 
@@ -180,6 +194,24 @@ Monster.prototype.move = function(delta){
 // }
 
 Monster.prototype.render = function(ctx){
+    // Render carrot
+    ctx.beginPath();
+    var cpt = this.carrot.pt;
+    context.arc(cpt[0], cpt[1], 5, 0, 2 * Math.PI, false);
+    context.lineWidth = 2;
+    context.strokeStyle = '#0000FF';
+    context.stroke();
+    
+    
+    // Render carrot
+    ctx.beginPath();
+    context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+    context.lineWidth = 2;
+    context.strokeStyle = '#000000';
+    context.stroke();
+    
+    
+
 	// console.log((this.getPreviousX()-this.getX())+':'+this.getX());
 	if(this.getPreviousX()>this.getX()){
 		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
