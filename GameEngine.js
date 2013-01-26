@@ -51,7 +51,6 @@ GameEngine.prototype.init = function(canvas){
     this.setCanvas(canvas);
     this.debugCanvas = null;
     this.debugContext = null;
-    this.testSprite = null;
 
     document.onkeyup = this.keyup.bind(this);
     document.onkeydown = this.keydown.bind(this);
@@ -61,23 +60,11 @@ GameEngine.prototype.init = function(canvas){
     canvas.onmousemove = this.canvasMouseMove.bind(this);
 
     // load the image assets
-    this.assetManager.queueDownload("sprite/trap1body.png"); // TODO load real assets
+    this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
     this.assetManager.downloadAll(function(){});
-    var trap_sprite = that.assetManager.getAsset("sprite/trap1body.png");
-    var trap_ss = new SpriteSheet({
-        image:trap_sprite,
-        width:200,
-        height:200,
-        sprites:[{name:'neutral',x:0, y:0},{name:'reset'},{name:'ready'}]});
-    var trap_animation = new Animation({
-        spriteSheet:trap_ss,
-        animation:[{spriteName:'neutral',length:1},
-                   {spriteName:'reset',length:1},
-                   {spriteName:'ready',length:1}],
-        repeat:true,
-        keyFrame:0
-    });
-    that.testSprite = trap_animation;
+
+    // add the traps
+    this.spawnTraps();
 };
 
 
@@ -111,7 +98,7 @@ GameEngine.prototype.clearWorld = function(){
 
 // Sets up a game world.
 GameEngine.prototype.newGame = function(){
-    this.clearWorld();
+    //this.clearWorld();
 
     this.gameState = this.gamePaused ? GameEngineStates.PAUSED : GameEngineStates.RUNNING;
 };
@@ -167,6 +154,42 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
 
 
 
+GameEngine.prototype.spawnTraps = function(){
+    console.log('Spawning Traps');
+    var that = this;
+    var trap_sprite = that.assetManager.getAsset("sprite/trap3 600x200.png");
+    var trap_ss = new SpriteSheet({
+        image:trap_sprite,
+        width:200,
+        height:200,
+        sprites:[{name:'neutral',x:0, y:0},{name:'reset'},{name:'ready'}]});
+    var trap_animation = new Animation({
+        spriteSheet:trap_ss,
+        animation:[{spriteName:'neutral',length:0},
+                   {spriteName:'reset',length:0.1},
+                   {spriteName:'ready',length:0.5}],
+        repeat:true,
+        keyFrame:0
+    });
+
+    var trap = new Trap({
+       id : 'trap1',
+       x : GAME_WIDTH/2,
+       y : GAME_HEIGHT/2,
+       speed : 0,
+       max_speed : 0,
+       visibility : 1,
+       damage : 10,
+       prevX : GAME_WIDTH/2,
+       prevY : GAME_HEIGHT/2,
+       animation : trap_animation
+    });
+    trap.activate();
+    this.gameObjects.push(trap);
+    this.traps.push(trap);
+    console.log(this.traps);
+    console.log("Finished spawning traps");
+}
 
 
 // Start/Resume game animation.
@@ -186,7 +209,6 @@ GameEngine.prototype.start = function(){
 
 GameEngine.prototype.tick = function tick(){
     var delta = this.timer.tick();
-    this.testSprite.update(delta); 
     
     // we're only using .gameSpeed as a "debug" feature
     // at this stage.
@@ -278,10 +300,9 @@ GameEngine.prototype.move = function(delta){
         removeFromList(monster, this.monsters);
     }.bind(this));
 
-
     // Move Traps
     this.traps.forEach(function(trap){
-        do_trap_move(delta, trap, this.map);
+        trap.move(delta, trap, this.map);
     }.bind(this));
 
 
@@ -293,6 +314,7 @@ GameEngine.prototype.move = function(delta){
 
 
 GameEngine.prototype.__checkCollisions = function(){
+    return; // TODO 
     /*
       The idea is that we check for collisions only
        for units which are 'close' to each other by
@@ -633,11 +655,10 @@ GameEngine.prototype.render = function(ctx){
     this.updateUI();
     
     // Fill Background, and CityMap/Roads
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "#AFAFAF";
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
-   
-    this.testSprite.render(this.context,GAME_WIDTH/3,GAME_HEIGHT/3);
+     
     // Draw (Renderable) Units
     for(var i = 0; i < this.gameObjects.length; i++){
         if(this.gameObjects[i]){

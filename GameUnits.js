@@ -51,7 +51,7 @@ Hero.prototype.moveLeft = function(delta){
 
 Hero.prototype.moveRight = function(delta){
 	// console.log("Moving Right");
-	this.x = Math.max(GAME_WIDTH,this.x+delta*this.speed);
+	this.x = Math.min(GAME_WIDTH,this.x+delta*this.speed);
 	// console.log(this.x,',',this.y);
 }
 
@@ -83,10 +83,34 @@ function Trap(args){
 
 	this.health = 1; // This is pretty just so it doesn't return true on isExpired
 	this.speed = 0;
+	this.isActive = false;
+
+	this.spriteAnimation = args.animation || null;
 }
 
 Trap.prototype = new GameObject();
 
+Trap.prototype.move = function(delta){
+	if(this.isActive){
+		this.spriteAnimation.update(delta);
+	}
+}
+
+Trap.prototype.render = function(ctx){
+	if(!this.isActive){
+		// Trap has not been activated by player
+		this.spriteAnimation.reset();
+	} 
+	this.spriteAnimation.render(ctx,this.x,this.y,1,this.visibility);
+}
+
+Trap.prototype.canDealDamage = function(){
+	// This assumes that traps have their first frame as non-damaging frame
+	return (this.spriteAnimation.getIndex() != 0);
+}
+
+Trap.prototype.activate = function(){ this.isActive = true; }
+Trap.prototype.deactivate = function(){ this.isActive = false; }
 
 /*
 Augment GameObject with Bullet characteristics

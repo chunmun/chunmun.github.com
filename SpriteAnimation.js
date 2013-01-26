@@ -52,7 +52,7 @@ SpriteSheet.prototype.getOffset = function(spriteName) {
 
 /*
 Defines the Animation class that plays the sprite
-Example of args.animation = [{spriteName:"walk_1",length:100},{spriteName:"walk_2",length:100}]
+Example of args.animation = [{spriteName:"walk_1",length:1},{spriteName:"walk_2",length:1}]
 */
 var Animation = function(args){
     this.spriteSheet = args.spriteSheet;
@@ -91,9 +91,13 @@ Animation.prototype.update = function(delta) {
     this.frame = this.spriteAnimation[this.index];
 };
 
-Animation.prototype.render = function(ctx,x,y){
-    console.log(this.index);
-    var frame = this.frame;
+Animation.prototype.getIndex = function(){
+    return this.index;
+}
+
+Animation.prototype.render = function(ctx,x,y,scale,visibility){
     var info = this.spriteSheet.getOffset(this.frame.spriteName);
-    ctx.drawImage(info.image,info.x,info.y,info.width,info.height,x,y,info.width,info.height);
+    ctx.globalAlpha = visibility;
+    ctx.drawImage(info.image,info.x,info.y,info.width,info.height,x,y,info.width*scale,info.height*scale);
+    ctx.globalAlpha = 1;
 }
