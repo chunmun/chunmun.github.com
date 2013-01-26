@@ -128,41 +128,46 @@ GameEngine.prototype.pause = function(){
 /*
     For Game setup, populate the map with some amount of humans.
 */
+
 GameEngine.prototype.__populateMapWithMonsters = function(){
-    while(this.monsters.length < MAX_MONSTER_COUNT){
-        // Spawn a monster somewhere random on the map.
-        var id = "monster" + ("000" + this.__unit_counter).slice(-3);
-        this.__unit_counter++;
-
-
-    //     var rds = this.cityMap.getRoads();
-    //     var rd = rds[Math.floor(Math.random() * rds.length)];
-    //     var rdBBox = rd.getBoundingBox();
-        
-    //     var cx, cy;
-    //     if(rd.isVertical){
-    //         cx = rdBBox[0] + rdBBox[2] / 2;
-    //         cy = rdBBox[1] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[3] - 2*CIVILIAN_SQUARE_HALFWIDTH);
-    //     } else {
-    //         cx = rdBBox[0] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[2] - 2*CIVILIAN_SQUARE_HALFWIDTH);
-    //         cy = rdBBox[1] + rdBBox[3] / 2;
-    //     }
-    //     var civ = new Civilian({id: id, x: cx, y: cy});
-        
-    //     civ.setCurrentRoad(rd);
-    //     civ.setCurrentRoad(rd);
-        
-    //     civ.setDestinationPoint([cx, cy]);
-        
-    //     civ.setMoveAngle(rd.isVertical ? [Math.PI / 2, 3 * Math.PI / 2][Math.floor(Math.random()*2)] :
-    //                                      [0, Math.PI][Math.floor(Math.random()*2)]);
-        
-    //     this.civilians.push(civ);
-    //     this.movable.push(civ);
-    //     this.renderable.push(civ);
+    if (((Math.floor(this.hero.getHealth()) == 666) ||
+        (Math.floor(this.hero.getHealth()) == 333)) && (this.monsters.length <= MAX_MONSTER_COUNT)) {
+        this.spawnMonsters();
     }
-    
-    this.__updateFocusComboBox();
+                // while(this.monsters.length < MAX_MONSTER_COUNT){
+                //     // Spawn a monster somewhere random on the map.
+                //     var id = "monster" + ("000" + this.__unit_counter).slice(-3);
+                //     this.__unit_counter++;
+
+
+                // //     var rds = this.cityMap.getRoads();
+                // //     var rd = rds[Math.floor(Math.random() * rds.length)];
+                // //     var rdBBox = rd.getBoundingBox();
+                    
+                // //     var cx, cy;
+                // //     if(rd.isVertical){
+                // //         cx = rdBBox[0] + rdBBox[2] / 2;
+                // //         cy = rdBBox[1] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[3] - 2*CIVILIAN_SQUARE_HALFWIDTH);
+                // //     } else {
+                // //         cx = rdBBox[0] + CIVILIAN_SQUARE_HALFWIDTH + Math.random() * (rdBBox[2] - 2*CIVILIAN_SQUARE_HALFWIDTH);
+                // //         cy = rdBBox[1] + rdBBox[3] / 2;
+                // //     }
+                // //     var civ = new Civilian({id: id, x: cx, y: cy});
+                    
+                // //     civ.setCurrentRoad(rd);
+                // //     civ.setCurrentRoad(rd);
+                    
+                // //     civ.setDestinationPoint([cx, cy]);
+                    
+                // //     civ.setMoveAngle(rd.isVertical ? [Math.PI / 2, 3 * Math.PI / 2][Math.floor(Math.random()*2)] :
+                // //                                      [0, Math.PI][Math.floor(Math.random()*2)]);
+                    
+                // //     this.civilians.push(civ);
+                // //     this.movable.push(civ);
+                // //     this.renderable.push(civ);
+                // }
+                
+                // this.__updateFocusComboBox();
 };
 
 //Hans
@@ -432,6 +437,8 @@ GameEngine.prototype.move = function(delta){
     //this.__checkCollisionsNaive();
     this.hero.move(delta);
     this.heart.update(delta);
+
+    this.__populateMapWithMonsters();
 };
 
 GameEngine.prototype.__checkCollisions = function(){
