@@ -20,6 +20,7 @@ function GameObject(args){
     this.viewAngle = args.viewAngle || args.angle || 0;
     this.health = args.health || MAX_HEALTH;
     this.visibility = args.visibility || 0;
+    this.damage = args.damage || 0;
 
     this.prevX = args.prevX || this.x;
     this.prevY = args.prevY || this.y;
@@ -109,6 +110,8 @@ GameObject.prototype.getHealth = function(){ return this.health; };
 GameObject.prototype.setHealth = function(a){ this.health = a; };
 GameObject.prototype.getVisibility = function(){ return this.visibility; };
 GameObject.prototype.setVisibility = function(a) { this.visibility = a; };
+GameObject.prototype.getDamage = function() { return this.damage; };
+GameObject.prototype.setDamage = function(a) { this.damage = a; };
 
 GameObject.prototype.accelerate = function(ds){ this.adjustSpeed(ds || 150); };
 GameObject.prototype.decelerate = function(ds){ this.adjustSpeed(-ds || -100); };
