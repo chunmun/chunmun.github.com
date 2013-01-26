@@ -12,6 +12,7 @@ var HEALTH_MONSTER = 50;
 Augment GameObject with Hero characteristics
 */
 function Hero(args){
+	var that = this;
 	if(!args){
 		return;
 	}	
@@ -20,39 +21,76 @@ function Hero(args){
 	this.health = args.health || HEALTH_HERO;
 	this.speed = args.speed || SPEED_HERO;
 
-	console.log('Created hero at ',this.getX(),',',this.getY(),',speed:',this.getSpeed());
+	this.scale = args.scale;
+	this.spriteSheet = args.spriteSheet;
+	this.upAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"up1",length:1},{spriteName:"up2",length:1},{spriteName:"up3",length:1},{spriteName:"up4",length:1}],
+		repeat:true,
+		keyframe:0
+	});
+
+	this.downAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"dn1",length:1},{spriteName:"dn2",length:1},{spriteName:"dn3",length:1},{spriteName:"dn4",length:1}],
+		repeat:true,
+		keyframe:0
+	});
+
+	this.leftAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"lf1",length:1},{spriteName:"lf2",length:1},{spriteName:"lf3",length:1},{spriteName:"lf4",length:1}],
+		repeat:true,
+		keyframe:0
+	});
+
+	this.rightAnimation = new Animation({
+		spriteSheet:this.spriteSheet,
+		animation:[{spriteName:"rg1",length:1},{spriteName:"rg2",length:1},{spriteName:"rg3",length:1},{spriteName:"rg4",length:1}],
+		repeat:true,
+		keyframe:0
+	});
+	console.log(this.downAnimation);
 }
 
 Hero.prototype = new GameObject();
 
 Hero.prototype.moveUp = function(delta){
-	var that = this;
-	// console.log("Moving Up");
-	console.log(this);
-	var speed = that.getSpeed();
-	var small = delta*this.getSpeed();
-	var result = this.getY()-delta*this.getSpeed();
-	var math_rest = Math.max(0,this.getY()-delta*this.getSpeed());
 	this.setY(Math.max(0,this.getY()-delta*this.getSpeed()));
-	console.log(this.getX(),',',this.getY());
+	this.upAnimation.update(delta);
 }
 
 Hero.prototype.moveDown = function(delta){
-	// console.log("Moving Down");
-	this.y = Math.min(GAME_HEIGHT,this.y+delta*this.speed);
-	// console.log(this.x,',',this.y);
+	this.setY(Math.min(GAME_HEIGHT,this.getY()+delta*this.getSpeed()));
+	this.downAnimation.update(delta);
 }
 
 Hero.prototype.moveLeft = function(delta){
-	// console.log("Moving Left");
-	this.x = Math.max(0,this.x-delta*this.speed);
-	// console.log(this.x,',',this.y);
+	this.setX(Math.max(0,this.getX()-delta*this.getSpeed()));
+	this.leftAnimation.update(delta);
 }
 
 Hero.prototype.moveRight = function(delta){
-	// console.log("Moving Right");
-	this.x = Math.min(GAME_WIDTH,this.x+delta*this.speed);
-	// console.log(this.x,',',this.y);
+	this.setX(Math.min(GAME_WIDTH,this.getX()+delta*this.getSpeed()));
+	this.rightAnimation.update(delta);
+}
+
+Hero.prototype.render = function(ctx){
+	if(this.getPreviousX()<this.getX()){
+		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	} else if(this.getPreviousX()>this.getX()){
+		this.rightAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	} else if(this.getPreviousY()>this.getY()){
+		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	} else if(this.getPreviousY()<this.getY()){
+		this.upAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);		
+	} else {
+		console.log("HERE");
+		console.log(this.downAnimation);
+		this.downAnimation.reset();
+		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	}
+
 }
 
 /*
@@ -83,9 +121,11 @@ function Trap(args){
 
 	this.health = 1; // This is pretty just so it doesn't return true on isExpired
 	this.speed = 0;
+	this.scale = args.scale || 1;
 	this.isActive = false;
 
 	this.spriteAnimation = args.animation || null;
+	console.log(this.spriteAnimation);
 }
 
 Trap.prototype = new GameObject();
@@ -101,7 +141,7 @@ Trap.prototype.render = function(ctx){
 		// Trap has not been activated by player
 		this.spriteAnimation.reset();
 	} 
-	this.spriteAnimation.render(ctx,this.x,this.y,1,this.visibility);
+	this.spriteAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 }
 
 Trap.prototype.canDealDamage = function(){

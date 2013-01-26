@@ -27,6 +27,8 @@ SpriteSheet.prototype.load = function(data){
     this._width = data.width;
     this._sprites = data.sprites;
     this._image = data.image;
+    this._cols = data.cols || 200;
+    this._rows = data.rows || 1;
 };
  
 SpriteSheet.prototype.getOffset = function(spriteName) {
@@ -39,8 +41,8 @@ SpriteSheet.prototype.getOffset = function(spriteName) {
             //Sprite-specific x and y offset is then added into it.
             return {
                 image: this._image,
-                x: (i * this._width) + (sprite.x||0),
-                y: (sprite.y||0),
+                x: ((i%this._cols) * this._width) + (sprite.x||0),
+                y: (Math.floor(i/this._rows) * this._height) + (sprite.y||0),
                 width: this._width,
                 height: this._height
             };

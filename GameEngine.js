@@ -7,7 +7,6 @@ var GAME_HEIGHT = 640;
 var GAME_WIDTH = 480;
 
 var MAX_MONSTER_COUNT = 10;
-var DEFAULT_HERO_ARGS = {id:0, x:GAME_WIDTH/2, y:GAME_HEIGHT/2, visibility:1, damage:0, polyCoords:[]};
 
 var MAX_DELTA = 0.05;
 var DEBUG_SHOW_FRAMERATE = true;
@@ -27,7 +26,7 @@ function GameEngine(canvas){
     this.assetManager = new AssetManager();
     // TODO need map initialisation
 
-    this.hero = new Hero(DEFAULT_HERO_ARGS); // TODO need initialisation
+    this.hero = new Hero(); // TODO need initialisation
     this.monsters = [];
     this.traps = [];
 
@@ -61,10 +60,12 @@ GameEngine.prototype.init = function(canvas){
 
     // load the image assets
     this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
+    this.assetManager.queueDownload("sprite/hero.png");
     this.assetManager.downloadAll(function(){});
 
     // add the traps
     this.spawnTraps();
+    this.spawnHero();
 };
 
 
@@ -121,7 +122,8 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
         // Spawn a monster somewhere random on the map.
         var id = "monster" + ("000" + this.__unit_counter).slice(-3);
         this.__unit_counter++;
-    
+
+
     //     var rds = this.cityMap.getRoads();
     //     var rd = rds[Math.floor(Math.random() * rds.length)];
     //     var rdBBox = rd.getBoundingBox();
@@ -182,6 +184,7 @@ GameEngine.prototype.spawnTraps = function(){
        damage : 10,
        prevX : GAME_WIDTH/2,
        prevY : GAME_HEIGHT/2,
+       scale : 0.2,
        animation : trap_animation
     });
     trap.activate();
@@ -189,6 +192,36 @@ GameEngine.prototype.spawnTraps = function(){
     this.traps.push(trap);
     console.log(this.traps);
     console.log("Finished spawning traps");
+}
+
+
+GameEngine.prototype.spawnHero = function(){
+    var that = this;
+    var DEFAULT_HERO_ARGS = {
+        id:0, 
+        x:GAME_WIDTH/2, 
+        y:GAME_HEIGHT/2, 
+        visibility:1, 
+        damage:0, 
+        scale:1, 
+        spriteSheet:(function(){
+            var hero_sprite = that.assetManager.getAsset("sprite/hero.png");
+            var hero_ss = new SpriteSheet({
+                image:hero_sprite,
+                width:200,
+                height:200,
+                cols:4,
+                rows:4,
+                sprites:[{name:'up1'},{name:'up2'},{name:'up3'},{name:'up4'},
+                         {name:'dn1'},{name:'dn2'},{name:'dn3'},{name:'dn4'},
+                         {name:'lf1'},{name:'lf2'},{name:'lf3'},{name:'lf4'},
+                         {name:'rg1'},{name:'rg2'},{name:'rg3'},{name:'rg4'}]});
+            return hero_ss;
+        })()
+    };
+
+    that.hero = new Hero(DEFAULT_HERO_ARGS);
+    that.gameObjects.push(this.hero);
 }
 
 
