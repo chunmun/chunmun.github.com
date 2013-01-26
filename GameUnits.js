@@ -219,19 +219,44 @@ Monster.prototype.render = function(ctx){
     
 
 	// console.log((this.getPreviousX()-this.getX())+':'+this.getX());
-	if(this.getPreviousX()>this.getX()){
+	var deltaX = this.getX() - this.getPreviousX();
+	var deltaY = this.getY() - this.getPreviousY();
+	///////////////////////////////////////////////////////////////////////////////ORIGINAL
+	// if(this.getPreviousX()>this.getX()){
+	// 	this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	// 	this.setX(this.getX());
+	// 	return;
+	// } else if(this.getPreviousX()<this.getX()){
+	// 	this.rightAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	// 	this.setX(this.getX());
+	// 	return;
+	// } else if(this.getPreviousY()<this.getY()){
+	// 	this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	// 	this.setY(this.getY());
+	// 	return;
+	// } else if(this.getPreviousY()>this.getY()){
+	// 	this.upAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);		
+	// 	this.setY(this.getY());
+	// 	return;
+	// } else {
+	// 	this.downAnimation.reset();
+	// 	this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+	// 	return;
+	// }
+	//////////////////////////////////////////////////////////////////////////////////////
+	if ((deltaX < 0) && (Math.abs(deltaX) > Math.abs(deltaY))){
 		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 		this.setX(this.getX());
 		return;
-	} else if(this.getPreviousX()<this.getX()){
+	} else if((deltaX > 0) && (Math.abs(deltaX) > Math.abs(deltaY))){
 		this.rightAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 		this.setX(this.getX());
 		return;
-	} else if(this.getPreviousY()<this.getY()){
+	} else if(deltaY > 0){
 		this.downAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 		this.setY(this.getY());
 		return;
-	} else if(this.getPreviousY()>this.getY()){
+	} else if(deltaY < 0){
 		this.upAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);		
 		this.setY(this.getY());
 		return;
