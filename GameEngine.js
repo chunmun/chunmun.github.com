@@ -9,6 +9,7 @@ var GAME_WIDTH = 480;
 var MAX_MONSTER_COUNT = 10;
 var DEFAULT_HERO_ARGS = {id:0, x:GAME_WIDTH/2, y:GAME_HEIGHT/2, visibility:1, damage:0, polyCoords:[]};
 
+var MAX_DELTA = 0.05;
 var DEBUG_SHOW_FRAMERATE = true;
 
 /**
@@ -50,6 +51,7 @@ GameEngine.prototype.init = function(canvas){
     this.setCanvas(canvas);
     this.debugCanvas = null;
     this.debugContext = null;
+    this.testSprite = null;
 
     document.onkeyup = this.keyup.bind(this);
     document.onkeydown = this.keydown.bind(this);
@@ -59,13 +61,23 @@ GameEngine.prototype.init = function(canvas){
     canvas.onmousemove = this.canvasMouseMove.bind(this);
 
     // load the image assets
-    this.assetManager.queueDownload("sprite/test.png"); // TODO load real assets
-    this.assetManager.downloadAll(function(){
-        var x = GAME_WIDTH/2, y = GAME_HEIGHT/2;
-        var hero_sprite = that.assetManager.getAsset("sprite/test.png");
-
-        that.context.drawImage(hero_sprite,x-hero_sprite.width/2,y-hero_sprite.height/2);
+    this.assetManager.queueDownload("sprite/trap1body.png"); // TODO load real assets
+    this.assetManager.downloadAll(function(){});
+    var trap_sprite = that.assetManager.getAsset("sprite/trap1body.png");
+    var trap_ss = new SpriteSheet({
+        image:trap_sprite,
+        width:200,
+        height:200,
+        sprites:[{name:'neutral',x:0, y:0},{name:'reset'},{name:'ready'}]});
+    var trap_animation = new Animation({
+        spriteSheet:trap_ss,
+        animation:[{spriteName:'neutral',length:1},
+                   {spriteName:'reset',length:1},
+                   {spriteName:'ready',length:1}],
+        repeat:true,
+        keyFrame:0
     });
+    that.testSprite = trap_animation;
 };
 
 
@@ -174,6 +186,7 @@ GameEngine.prototype.start = function(){
 
 GameEngine.prototype.tick = function tick(){
     var delta = this.timer.tick();
+    this.testSprite.update(delta); 
     
     // we're only using .gameSpeed as a "debug" feature
     // at this stage.
@@ -247,7 +260,8 @@ GameEngine.prototype.__moveBullets = function(delta){
  O(n^2)
 */
 GameEngine.prototype.move = function(delta){
-    this.handlePlayerInput(delta);
+    var that = this;
+    that.handlePlayerInput(delta);
     this.__moveBullets(delta);
 
     // Move Monsters
@@ -619,10 +633,11 @@ GameEngine.prototype.render = function(ctx){
     this.updateUI();
     
     // Fill Background, and CityMap/Roads
-    // ctx.fillStyle = "#AAAAAA";
-    // ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     //this.cityMap.render(ctx);
    
+    this.testSprite.render(this.context,GAME_WIDTH/3,GAME_HEIGHT/3);
     // Draw (Renderable) Units
     for(var i = 0; i < this.gameObjects.length; i++){
         if(this.gameObjects[i]){
@@ -768,7 +783,7 @@ GameEngine.prototype.canvasMouseMove = function(ev){
 
 function Timer(){
     this.gameTime = 0;
-    this.maxStep = 0.05;
+    this.maxStep = MAX_DELTA;
     this.wallLastTimestamp = 0;
 }
 

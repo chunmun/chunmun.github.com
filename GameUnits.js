@@ -2,8 +2,8 @@
 File for GameUnits - Hero, Monsters, Traps and Bullets
 */
 
-var SPEED_HERO = 25;
-var SPEED_MONSTER = 10;
+var SPEED_HERO = 25.0;
+var SPEED_MONSTER = 10.0;
 
 var HEALTH_HERO = 1000;
 var HEALTH_MONSTER = 50;
@@ -19,24 +19,40 @@ function Hero(args){
 
 	this.health = args.health || HEALTH_HERO;
 	this.speed = args.speed || SPEED_HERO;
+
+	console.log('Created hero at ',this.getX(),',',this.getY(),',speed:',this.getSpeed());
 }
 
 Hero.prototype = new GameObject();
 
 Hero.prototype.moveUp = function(delta){
-	console.log("Moving Up");
+	var that = this;
+	// console.log("Moving Up");
+	console.log(this);
+	var speed = that.getSpeed();
+	var small = delta*this.getSpeed();
+	var result = this.getY()-delta*this.getSpeed();
+	var math_rest = Math.max(0,this.getY()-delta*this.getSpeed());
+	this.setY(Math.max(0,this.getY()-delta*this.getSpeed()));
+	console.log(this.getX(),',',this.getY());
 }
 
 Hero.prototype.moveDown = function(delta){
-	console.log("Moving Down");
+	// console.log("Moving Down");
+	this.y = Math.min(GAME_HEIGHT,this.y+delta*this.speed);
+	// console.log(this.x,',',this.y);
 }
 
 Hero.prototype.moveLeft = function(delta){
-	console.log("Moving Left");
+	// console.log("Moving Left");
+	this.x = Math.max(0,this.x-delta*this.speed);
+	// console.log(this.x,',',this.y);
 }
 
 Hero.prototype.moveRight = function(delta){
-	console.log("Moving Right");
+	// console.log("Moving Right");
+	this.x = Math.max(GAME_WIDTH,this.x+delta*this.speed);
+	// console.log(this.x,',',this.y);
 }
 
 /*
