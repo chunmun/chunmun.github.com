@@ -120,11 +120,44 @@ function Monster(args){
 
 	this.health = args.health || HEALTH_MONSTER;
 	this.speed = args.speed || SPEED_MONSTER;
+	this.isActive = false;
+	
+	this.spriteAnimation = args.animation || null;
 }
 
 Monster.prototype = new GameObject();
 
+Monster.prototype.getBoundingBox = function(){
+    var monstWidth = 200;
+    var monstHeight = 200;
+    return [this.x,
+            this.y,
+            this.x + monstWidth,
+            this.y + monstHeight];
+}
 
+//Hans
+Monster.prototype.move = function(delta){
+	if(this.isActive){
+		this.spriteAnimation.update(delta);
+	}
+}
+
+Monster.prototype.render = function(ctx){
+	if(!this.isActive){
+		// Monster has not been activated
+		this.spriteAnimation.reset();
+	}
+	this.spriteAnimation.render(ctx,this.x,this.y,1,this.visibility);
+}
+
+Monster.prototype.canDealDamage = function(){
+	// This assumes that traps have their first frame as non-damaging frame
+	return (this.spriteAnimation.getIndex() != 0);
+}
+
+Monster.prototype.activate = function(){ this.isActive = true; }
+Monster.prototype.deactivate = function(){ this.isActive = false; }
 
 /*
 Augment GameObject with Trap characteristics
@@ -145,6 +178,15 @@ function Trap(args){
 }
 
 Trap.prototype = new GameObject();
+
+Trap.prototype.getBoundingBox = function(){
+    var trapWidth = 200;
+    var trapHeight = 200;
+    return [this.x,
+            this.y,
+            this.x + trapWidth,
+            this.y + trapHeight];
+}
 
 Trap.prototype.move = function(delta){
 	if(this.isActive){

@@ -195,7 +195,7 @@ var Geometry = (function(){
     
     
     
-    function fact(n){ return n < 2 ? 1 : n * fact(n - 1) };
+    function fact(n){ return (n < 2) ? 1 : n * fact(n - 1); };
     function C(n, r){ return fact(n) / (fact(r) * fact(n - r)); };
     var evaluateCurve = function(curve, t){
         /*
@@ -206,12 +206,12 @@ var Geometry = (function(){
         var tx = 0;
         var ty = 0;
         
-        var n = curve.length;
-        for(var i = 0; i < n; i++){
+        var n = curve.length - 1;
+        for(var i = 0; i <= n; i++){
             // See explicit formula of Bezier curve.
             var c = C(n, i) * Math.pow(1 - t, n - i) * Math.pow(t, i);
-            var tx += c * curve[i][0];
-            var ty += c * curve[i][1];
+            tx += c * curve[i][0];
+            ty += c * curve[i][1];
         }
         
         return [tx, ty];
@@ -220,7 +220,7 @@ var Geometry = (function(){
     
     
     function sub(pt1, pt2){ return [pt2[0] - pt1[0], pt2[1] - pt1[1]]; };
-    function magnitude(pt){ return Math.sqrt(pt[0]*pt[0] + pt[1]*pt[1]);
+    function magnitude(pt){ return Math.sqrt(pt[0]*pt[0] + pt[1]*pt[1]); };
     var estimateLength = function(curve, k){
         /*
           Estimate the length of the curve by sampling k + 1 points,
