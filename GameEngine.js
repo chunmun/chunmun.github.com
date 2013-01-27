@@ -3,13 +3,13 @@ var GameEngineStates = {PAUSED:  0,
                         LOST:    2,
                         WON:     4};
 
-var GAME_HEIGHT = 640;
-var GAME_WIDTH = 480;
+var GAME_HEIGHT = 480;
+var GAME_WIDTH = 640;
 
 var MAX_MONSTER_COUNT = 10;
 
 var MAX_DELTA = 0.5;
-var DEBUG_SHOW_FRAMERATE = true;
+var DEBUG_SHOW_FRAMERATE = !true;
 
 /**
 * An object to look after game animation/movement.
@@ -793,6 +793,15 @@ GameEngine.prototype.handlePlayerInput = function(delta){
    if(this.keysPressed[32]){
      this.__checkTrapActivation();
    }
+   
+   console.log("hPI");
+    if((this.gameState === GameEngineStates.WON ||
+        this.gameState === GameEngineStates.LOST) &&
+        this.keysPressed[13]){
+        // When the user presses the Enter key if they've won or lost, reset.
+        GameEngine.call(this);
+        this.init(this.canvas);
+    }
 };
 
 
@@ -1036,17 +1045,47 @@ GameEngine.prototype.render = function(ctx){
     context.fillText(100-this.dead, 580,70);   
     
     // If we have won or lost, then draw that we have won or lost.
-    if(this.gameState === GameEngineStates.WON){
+    if(this.gameState === GameEngineStates.WON){context.beginPath();
+        context.beginPath();
+        context.rect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        context.fillStyle = 'gray';
+        context.fill();
+        
+        context.font = 'italic 56px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Game Won", GAME_WIDTH / 2 + 3, GAME_HEIGHT / 2 + 3);
+        
         context.font = 'italic 56px Arial';
         context.fillStyle = 'green';
         context.textAlign = 'center';
         context.fillText("Game Won", GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        
+        context.font = 'italic 20px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Press <Enter> to Play Again.", GAME_WIDTH / 2, GAME_HEIGHT - 30);
     }
     if(this.gameState === GameEngineStates.LOST){
+        context.beginPath();
+        context.rect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        context.fillStyle = 'gray';
+        context.fill();
+        
+        context.font = 'italic 56px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Game Lost", GAME_WIDTH / 2 + 3, GAME_HEIGHT / 2 + 3);
+        
         context.font = 'italic 56px Arial';
         context.fillStyle = 'red';
         context.textAlign = 'center';
         context.fillText("Game Lost", GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        
+        context.font = 'italic 20px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Press <Enter> to Play Again.", GAME_WIDTH / 2, GAME_HEIGHT - 30);
     }
     
     context.font = oldFont;

@@ -75,12 +75,12 @@ Hero.prototype.moveUp = function(delta){
 }
 
 Hero.prototype.moveDown = function(delta){
-	this.setY(Math.min(GAME_HEIGHT-240,this.getY()+delta*this.getSpeed()));
+	this.setY(Math.min(GAME_HEIGHT- 60 - 20,this.getY()+delta*this.getSpeed()));
 	this.downAnimation.update(delta);
 }
 
 Hero.prototype.moveRight = function(delta){
-	this.setX(Math.min(GAME_WIDTH+80,this.getX()+delta*this.getSpeed()));
+	this.setX(Math.min(GAME_WIDTH- 60 - 20,this.getX()+delta*this.getSpeed()));
 	this.rightAnimation.update(delta);
 }
 
