@@ -121,7 +121,9 @@ function Monster(args){
 	
 	this.scale = args.scale;
 	this.spriteSheet = args.spriteSheet;
-    
+    this.t = 0;
+    this.startline = 5;
+
     this.carrot = args.carrot;
     
 	this.upAnimation = new Animation({
@@ -166,29 +168,33 @@ Monster.prototype.getBoundingBox = function(){
 
 //Hans
 Monster.prototype.move = function(delta,hero){
-	if(this.isActive){
-		this.leftAnimation.update(delta);
-		this.rightAnimation.update(delta);
-		this.upAnimation.update(delta);
-		this.downAnimation.update(delta);
-        
-        this.carrot.speed = this.speed * delta;
-        updateAICarrot(this.carrot);
-        
-        var cpt = this.carrot.pt;
-        var dx = cpt[0] - this.x;
-        var dy = cpt[1] - this.y;
+	this.t += delta;
 
-        // Consider if Hero is close by
-        if(this.getDistanceToUnit(hero)<100){
-	        dx = hero.getX() - this.x;
-	        dy = hero.getY() - this.y;
-        }
+	this.leftAnimation.update(delta);
+	this.rightAnimation.update(delta);
+	this.upAnimation.update(delta);
+	this.downAnimation.update(delta);
+    
+    this.carrot.speed = this.speed * delta;
+    updateAICarrot(this.carrot);
+    
+    var cpt = this.carrot.pt;
+    var dx = cpt[0] - this.x;
+    var dy = cpt[1] - this.y;
 
-        var theta = Math.atan2(-dy, dx);
-        this.setMoveAngle(theta);
-        GameObject.prototype.move.call(this, delta);
-	}
+    // Consider if Hero is close by
+    if(this.getDistanceToUnit(hero)<100 && this.isActive){
+        dx = hero.getX() - this.x;
+        dy = hero.getY() - this.y;
+    }
+
+    var theta = Math.atan2(-dy, dx);
+    this.setMoveAngle(theta);
+    GameObject.prototype.move.call(this, delta);
+
+    if(this.t>this.startline){
+    	this.isActive = true;
+    }
 }
 
 // Monster.prototype.render = function(ctx){
@@ -245,6 +251,13 @@ Monster.prototype.render = function(ctx){
 	// 	return;
 	// }
 	//////////////////////////////////////////////////////////////////////////////////////
+	var temp = this.visibility;
+	if(!this.isActive){
+		this.visibility = this.t/this.startline
+	}else{
+		this.visiblity = 1;
+	}
+
 	if ((deltaX < 0) && (Math.abs(deltaX) > Math.abs(deltaY))){
 		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 		this.setX(this.getX());
@@ -267,12 +280,9 @@ Monster.prototype.render = function(ctx){
 		return;
 	}
 
+	this.visibility = temp
 }
 
-Monster.prototype.canDealDamage = function(){
-	// This assumes that traps have their first frame as non-damaging frame
-	return (this.spriteAnimation.getIndex() != 0);
-}
 
 Monster.prototype.activate = function(){ this.isActive = true; }
 Monster.prototype.deactivate = function(){ this.isActive = false; }
