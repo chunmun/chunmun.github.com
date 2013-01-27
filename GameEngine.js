@@ -408,7 +408,7 @@ GameEngine.prototype.move = function(delta){
 
     // Move Monsters
     this.monsters.forEach(function(monster){
-        monster.move(delta, monster, this.map);
+        monster.move(delta, that.hero);
     }.bind(this));
 
     // Remove dead monsters

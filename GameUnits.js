@@ -165,7 +165,7 @@ Monster.prototype.getBoundingBox = function(){
 }
 
 //Hans
-Monster.prototype.move = function(delta){
+Monster.prototype.move = function(delta,hero){
 	if(this.isActive){
 		this.leftAnimation.update(delta);
 		this.rightAnimation.update(delta);
@@ -178,7 +178,13 @@ Monster.prototype.move = function(delta){
         var cpt = this.carrot.pt;
         var dx = cpt[0] - this.x;
         var dy = cpt[1] - this.y;
-        
+
+        // Consider if Hero is close by
+        if(this.getDistanceToUnit(hero)<100){
+	        dx = hero.getX() - this.x;
+	        dy = hero.getY() - this.y;
+        }
+
         var theta = Math.atan2(-dy, dx);
         this.setMoveAngle(theta);
         GameObject.prototype.move.call(this, delta);
