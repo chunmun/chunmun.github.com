@@ -27,6 +27,7 @@ function GameEngine(canvas){
     this.gameBeatInterval = 15;
 
     this.assetManager = new AssetManager();
+    this.audioManager = new AudioManager();
     // TODO need map initialisation
 
     this.hero = new Hero(); // TODO need initialisation
@@ -34,6 +35,8 @@ function GameEngine(canvas){
     this.map = createDefaultMap();
     this.monsters = [];
     this.traps = [];
+    this.gore = [];
+    this.backgroundgore = [];
 
     this.bullets = [];
     this.gameSpeed = 1;
@@ -64,14 +67,22 @@ GameEngine.prototype.init = function(canvas){
     canvas.onmousemove = this.canvasMouseMove.bind(this);
 
     // load the image assets
-    this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
-    this.assetManager.queueDownload("sprite/Hero sprites.png");
-	this.assetManager.queueDownload("sprite/Monster 1 complete Sprite.png");
-	this.assetManager.queueDownload("sprite/Monster 1 Sprite.png");
-    this.assetManager.queueDownload("sprite/Dungeonbg.png");
-    this.assetManager.queueDownload("sprite/healthbarred.png");
-    this.assetManager.queueDownload("sprite/healthheart 260x130.png");
+    var imageAssets = ["sprite/trap3 600x200.png",
+                        "sprite/Hero sprites.png",
+                        "sprite/Monster 1 complete Sprite.png",
+                        "sprite/Monster 1 Sprite.png",
+                        "sprite/Dungeonbg.png",
+                        "sprite/healthbarred.png",
+                        "sprite/healthheart 260x130.png",
+                        "sprite/bloodburst.png"
+                        ];    
+    imageAssets.forEach(function(path){that.assetManager.queueDownload(path);});
     this.assetManager.downloadAll(function(){});
+
+    // load the audio assets
+    var audioAssets = [];
+    audioAssets.forEach(function(path){that.audioManager.queueDownload(path);});
+    this.audioManager.downloadAll(function(){});
 
     // add the traps
     this.spawnTraps();
@@ -210,7 +221,7 @@ GameEngine.prototype.spawnMonsters = function(){
 
     var monster = new Monster(DEFAULT_MONSTER_ARGS);
     that.gameObjects.push(monster);
-    monster.activate();
+    monster.deactivate();
     this.monsters.push(monster);
     console.log(this.monsters);
     console.log("Finished spawning monster");
@@ -366,9 +377,10 @@ GameEngine.prototype.tick = function tick(){
 */
 GameEngine.prototype.__checkGameTerminationConditions = function(){
     // The game is won if there are no more monsters
-    // if(this.monsters.length === 0){
-    //     this.gameState = GameEngineStates.WON;
-    // }
+    if(this.monsters.length === 0 && this.hero.getHealth()<300){
+        this.gameState = GameEngineStates.WON;
+        this.timer.stop();
+    }
     
     // The game is lost if the hero has no more health 
     if(this.hero.getHealth() <= 0){
@@ -438,6 +450,9 @@ GameEngine.prototype.move = function(delta){
     this.hero.move(delta);
     this.heart.update(delta);
 
+    // Move Gore
+    this.gore.forEach(function(blood){blood.gore.update(delta);});
+
     this.__populateMapWithMonsters();
 };
 
@@ -482,7 +497,7 @@ GameEngine.prototype.__checkCollisions = function(){
             var yVal = arr[i].y-arr[j].y;
             var yValSq = yVal*yVal;
             var dist = xValSq + yValSq;
-            if (dist < 200){
+            if (dist < 500){
                 this.handleCollision(arr[i], arr[j]);
             }
         }
@@ -534,7 +549,12 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
        // Might want to do collision for them
      }else if(obj2 instanceof Trap){
         // Monster-Trap
-        obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+        if(obj2.isActive){
+            obj1.setHealth(obj1.getHealth()-obj2.getDamage());
+           this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
+           this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
+           this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
+        }
      }else{
         // Monster-Hero
         obj2.setHealth(obj2.getHealth()-obj1.getDamage());
@@ -542,7 +562,12 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
    }else if(obj1 instanceof Trap){
      if(obj2 instanceof Monster){
        // Trap-Monster
-       obj2.setHealth(obj2.getHealth()-obj1.getDamage());
+       if(obj1.isActive){
+           obj2.setHealth(obj2.getHealth()-obj1.getDamage());
+           this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
+           this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
+           this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
+       }
      }else if(obj2 instanceof Trap){
         // Trap-Trap
         // This shld not happen
@@ -802,6 +827,10 @@ GameEngine.prototype.render = function(ctx){
     //this.cityMap.render(ctx);
     //////////////////////////////////////////////////////////////////////////                                TO SHOW PATH
     //this.map.renderMapPathData(ctx);
+    // Draw background gore
+    for(var i = 0; i < this.backgroundgore.length; i++){
+        this.backgroundgore[i].gore.render(ctx,this.backgroundgore[i].x,this.backgroundgore[i].y,0.2,1);
+    }
      
     // Draw traps
     var MAX_LOS = 150;
@@ -810,7 +839,6 @@ GameEngine.prototype.render = function(ctx){
             var dist = this.hero.getDistanceToUnit(this.traps[i]);
             if(this.traps[i].isActive){
                 this.traps[i].render(ctx);
-                console.log(this.traps[i].spriteAnimation.getIndex());
             } else {
                 if(dist<MAX_LOS){
                     this.gameObjects[i].setVisibility((MAX_LOS-dist)/MAX_LOS);
@@ -841,6 +869,19 @@ GameEngine.prototype.render = function(ctx){
     // Draw the hero 
     this.hero.render(ctx);
     
+    // Draw the Gore
+    var temp = [];
+    for(var i = 0; i < this.gore.length; i++){
+        this.gore[i].gore.render(ctx,this.gore[i].x,this.gore[i].y,0.2,1);
+        if(this.gore[i].gore.getIndex()==4){
+            this.backgroundgore.push(this.gore[i]);
+        }else{
+            temp.push(this.gore[i]);
+        }
+    }
+
+    this.gore = temp;
+
     //
     // Text rendering
     //
@@ -976,6 +1017,34 @@ GameEngine.prototype.canvasMouseMove = function(ev){
     this.mouseY = ev.y - offset.top;
 };
 
+GameEngine.prototype.spawnGoreAnimation = function(x,y,speed){
+    var blood_sprite = this.assetManager.getAsset("sprite/bloodburst.png");
+    console.log(blood_sprite);
+    var blood_ss = new SpriteSheet({
+        image:blood_sprite,
+        width:200,
+        height:200,
+        cols:5,
+        rows:1,
+        sprites:[{name:'bb1'},{name:'bb2'},{name:'bb3'},{name:'bb4'},{name:'bb5'}]
+    });
+ 
+    var blood = new Animation({
+        spriteSheet:blood_ss,
+        repeat:false,
+        keyFrame:0,
+        animation:[{spriteName:'bb1',length:0.1},
+                   {spriteName:'bb2',length:0.1},
+                   {spriteName:'bb3',length:0.1},
+                   {spriteName:'bb4',length:0.4},
+                   {spriteName:'bb5',length:0.2}]
+    });
+
+    blood.setSpeed(speed);
+    console.log(blood);
+    this.gore.push({gore:blood,x:x,y:y});
+}
+
 function Timer(){
     this.gameTime = 0;
     this.maxStep = MAX_DELTA;
@@ -999,3 +1068,4 @@ Timer.prototype.tick = function(){
 Timer.prototype.stop = function(){
     this.stopped = true;
 }
+

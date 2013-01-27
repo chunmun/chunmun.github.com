@@ -308,7 +308,6 @@ Trap.prototype.getBoundingBox = function(){
 
 Trap.prototype.move = function(delta){
 	if(this.isActive){
-		console.log("This is active with delta :" + delta);
 		this.spriteAnimation.update(delta);
 	}
 }

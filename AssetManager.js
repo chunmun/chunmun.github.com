@@ -48,3 +48,31 @@ AssetManager.downloadAll(function(){
 	ctx.drawImage(sprite,x-sprite.width/2,y-sprite.height/2);
 }
 */
+
+function AudioManager(args){
+	AssetManager.call(this,args);
+}
+
+AudioManager.prototype = new AssetManager();
+
+AudioManager.prototype.downloadAll = function(){
+	for(var i=0;i < this.downloadQueue.length;i++){
+		var path = this.downloadQueue[i];
+		var sound = new Audio();
+		var that = this;
+		sound.addEventListener("load", function(){
+			that.successCount++;
+			if(that.isDone()){
+				callback();
+			}
+		});
+
+		sound.addEventListener("error", function(){
+			that.errorCount++;
+			if(that.isDone()){
+				callback();
+			}
+		});
+		this.cache[path] = sound;
+	}
+}
