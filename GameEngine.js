@@ -659,7 +659,7 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
            this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
            this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
            this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
-           this.quish_aud.currentTime = 0;
+           this.squish_aud.currentTime = 0;
            this.squish_aud.play();
         }
      }else{
