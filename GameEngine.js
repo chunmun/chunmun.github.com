@@ -81,12 +81,13 @@ GameEngine.prototype.init = function(canvas){
                         "sprite/bloodburst.png",
                         "sprite/Bloodaltar.png",
                         "sprite/Hero Sacrificing.png",
+                        "sprite/Tutorial.png"
                         ];    
     imageAssets.forEach(function(path){that.assetManager.queueDownload(path);});
     this.assetManager.downloadAll(function(){});
 
     // load the audio assets
-    var audioAssets = [];
+    var audioAssets = ["audio/bgsound.wav"];
     audioAssets.forEach(function(path){that.audioManager.queueDownload(path);});
     this.audioManager.downloadAll(function(){});
 
@@ -94,6 +95,7 @@ GameEngine.prototype.init = function(canvas){
     this.spawnHero();
     this.spawnHeart();
     this.spawnAltar();
+    this.startBGM();
 };
 
 
@@ -231,13 +233,13 @@ GameEngine.prototype.spawnAltar = function(){
                 {spriteName:'ba4',length:0.1},
                 {spriteName:'ba5',length:0.1},
                 {spriteName:'ba6',length:0.1},
-                {spriteName:'ba7',length:0.1},
-                {spriteName:'ba8',length:0.1},
-                {spriteName:'ba9',length:0.1},
-                {spriteName:'ba10',length:0.1}],
+                {spriteName:'ba7',length:0.2},
+                {spriteName:'ba8',length:0.5},
+                {spriteName:'ba9',length:0.5},
+                {spriteName:'ba10',length:0.5}],
         repeat:true,
         keyFrame:0,
-        loopFrame:6
+        loopFrame:4
     });
     var altar_obj = new Altar({
         id : 'trap0', 
@@ -541,9 +543,7 @@ GameEngine.prototype.move = function(delta){
    }
     this.heart.update(delta);
 
-    if(!(this.altar.hasActived)){
-        this.altar.move(delta,this.hero);
-    }
+    this.altar.move(delta,this.hero);
 
     // Move Gore
     this.gore.forEach(function(blood){blood.gore.update(delta);});
@@ -944,13 +944,21 @@ GameEngine.prototype.render = function(ctx){
                 this.traps[i].render(ctx);
             } else {
                 if(dist<MAX_LOS){
-                    this.traps[i].setVisibility((MAX_LOS-dist)/MAX_LOS);
+                    var vi = (MAX_LOS-dist)/MAX_LOS;
+                    this.traps[i].setVisibility(vi);
                     this.traps[i].render(ctx);
                 } else {
                     // Don't render them
                 }
             }
         }
+    }
+
+    if(!(this.altar.hasActived) && this.hero.getDistanceToUnit(this.altar)<MAX_LOS){
+        ctx.globalAlpha = (MAX_LOS-this.hero.getDistanceToUnit(this.altar))/MAX_LOS;
+        var tutorial = this.assetManager.getAsset("sprite/Tutorial.png");
+        ctx.drawImage(tutorial,this.hero.getX()-70,this.hero.getY()+50,200,100);
+        ctx.globalAlpha = 1;
     }
 
     // Draw the monsters
@@ -1179,3 +1187,8 @@ Timer.prototype.stop = function(){
     this.stopped = true;
 }
 
+GameEngine.prototype.startBGM = function(){
+    var bgm = this.audioManager.getAsset("audio/bgsound.wav");
+    bgm.loop = true;
+    bgm.play();
+}

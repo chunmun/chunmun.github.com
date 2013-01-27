@@ -55,7 +55,7 @@ function AudioManager(args){
 
 AudioManager.prototype = new AssetManager();
 
-AudioManager.prototype.downloadAll = function(){
+AudioManager.prototype.downloadAll = function(callback){
 	for(var i=0;i < this.downloadQueue.length;i++){
 		var path = this.downloadQueue[i];
 		var sound = new Audio();
@@ -73,6 +73,7 @@ AudioManager.prototype.downloadAll = function(){
 				callback();
 			}
 		});
+		sound.src = path;
 		this.cache[path] = sound;
 	}
 }

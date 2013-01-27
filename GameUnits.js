@@ -59,7 +59,7 @@ function Hero(args){
 		repeat:true,
 		keyframe:0,
 	});
-	this.sacrificeTime = 0.2;
+	this.sacrificeTime = 0.5;
 	
 }
 
@@ -90,7 +90,7 @@ Hero.prototype.moveLeft = function(delta){
 }
 
 Hero.prototype.move = function(delta){
-	this.health -= delta*10;
+	this.health -= delta*3;
 	if(this.isSacrificing){
 		this.t += delta;
 		this.sacrificeAnimation.update(delta);
@@ -448,7 +448,7 @@ Bullet.prototype.render = function(ctx){
 function Altar(args){
     if(!args) return;
 	Trap.call(this,args);
-	this.speed = 50;
+	this.speed = 700;
     
     this.hasActivated = false;
     this.gameStartCallback = args.altarCallback;
@@ -480,6 +480,10 @@ Altar.prototype.move = function(delta,hero){
 
 	    var theta = Math.atan2(-dy, dx);
 	    this.setMoveAngle(theta);
-	    GameObject.prototype.move.call(this, delta);
+		GameObject.prototype.move.call(this, delta);	    
+
+    }else{
+    	this.spriteAnimation.update(delta); 	
     }
+
 }
