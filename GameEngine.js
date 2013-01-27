@@ -1028,17 +1028,47 @@ GameEngine.prototype.render = function(ctx){
     context.fillText(100-this.dead, 580,70);   
     
     // If we have won or lost, then draw that we have won or lost.
-    if(this.gameState === GameEngineStates.WON){
+    if(this.gameState === GameEngineStates.WON){context.beginPath();
+        context.beginPath();
+        context.rect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        context.fillStyle = 'gray';
+        context.fill();
+        
+        context.font = 'italic 56px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Game Won", GAME_WIDTH / 2 + 3, GAME_HEIGHT / 2 + 3);
+        
         context.font = 'italic 56px Arial';
         context.fillStyle = 'green';
         context.textAlign = 'center';
         context.fillText("Game Won", GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        
+        context.font = 'italic 20px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Press <Enter> to Play Again.", GAME_WIDTH / 2, GAME_HEIGHT - 30);
     }
     if(this.gameState === GameEngineStates.LOST){
+        context.beginPath();
+        context.rect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        context.fillStyle = 'gray';
+        context.fill();
+        
+        context.font = 'italic 56px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Game Lost", GAME_WIDTH / 2 + 3, GAME_HEIGHT / 2 + 3);
+        
         context.font = 'italic 56px Arial';
         context.fillStyle = 'red';
         context.textAlign = 'center';
         context.fillText("Game Lost", GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        
+        context.font = 'italic 20px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText("Press <Enter> to Play Again.", GAME_WIDTH / 2, GAME_HEIGHT - 30);
     }
     
     context.font = oldFont;
