@@ -2,7 +2,7 @@
 File for GameUnits - Hero, Monsters, Traps and Bullets
 */
 
-var SPEED_HERO = 60.0;
+var SPEED_HERO = 120.0;
 var SPEED_MONSTER = 40.0;
 
 var HEALTH_HERO = 1000;

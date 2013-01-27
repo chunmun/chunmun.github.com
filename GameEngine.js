@@ -89,7 +89,6 @@ GameEngine.prototype.init = function(canvas){
     this.audioManager.downloadAll(function(){});
 
     // add the traps
-    this.spawnTraps();
     this.spawnHero();
     this.spawnHeart();
     this.spawnAltar();
@@ -100,6 +99,7 @@ GameEngine.prototype.init = function(canvas){
 GameEngine.prototype.altarSacrificed = function(){
     // Let the games begin!
     this.spawnMonsters();
+    this.spawnTraps();
 }
 
 
@@ -153,6 +153,8 @@ GameEngine.prototype.pause = function(){
 */
 
 GameEngine.prototype.__populateMapWithMonsters = function(){
+    if(!this.altar.hasActived) return;
+    
     var hero_health = Math.floor(this.hero.getHealth());
 
     if(hero_health < 1000 && this.stage1_numbers>0 && Math.random()>0.95){
@@ -205,7 +207,7 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
 
 GameEngine.prototype.spawnAltar = function(){
     var that = this;
-    var altarSprite = this.assetManager.getAsset("Bloodaltar.png");
+    var altarSprite = this.assetManager.getAsset("sprite/Bloodaltar.png");
     var altar_ss = new SpriteSheet({
         image:altarSprite,
         width:200,
@@ -237,18 +239,19 @@ GameEngine.prototype.spawnAltar = function(){
     var altar_obj = new Altar({
         id : 'trap1', 
         x : 320,
-        y : 240,
+        y : 320,
         speed : 0,
         max_speed : 0,
         visibility : 1,
         damage : 20,
         prevX : GAME_WIDTH/2,
         prevY : GAME_HEIGHT/2,
-        scale : 0.2,
+        scale : 0.4,
         animation : altar_animation,
-        altarCallback: this.altarSacrificed
+        altarCallback: this.altarSacrificed.bind(this)
     });
     this.altar = altar_obj;
+    this.traps.push(altar_obj);
 }
 
 //Hans
