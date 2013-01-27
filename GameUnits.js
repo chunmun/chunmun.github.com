@@ -417,3 +417,18 @@ Bullet.prototype.render = function(ctx){
     ctx.lineTo(this.getPreviousX(), this.getPreviousY());
     ctx.stroke();
 }
+
+
+
+function Altar(args){
+    this.hasActivated = false;
+    this.x = args.x;
+    this.y = args.y;
+    this.gameStartCallback = args.altarCallback;
+}
+Altar.prototype = new Trap();
+
+Altar.prototype.activate = function(){
+    this.hasActived = true;
+    this.gameStartCallback();
+}
