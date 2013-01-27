@@ -23,38 +23,51 @@ function Hero(args){
 
 	this.scale = args.scale;
 	this.spriteSheet = args.spriteSheet;
+	this.isSacrificing = false;
+	this.t = 0;
 	this.upAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
 		animation:[{spriteName:"up1",length:0.1},{spriteName:"up2",length:0.1},{spriteName:"up3",length:0.1}],
 		repeat:true,
-		keyframe:0
+		keyFrame:0
 	});
 
 	this.downAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
 		animation:[{spriteName:"dn1",length:0.1},{spriteName:"dn2",length:0.1},{spriteName:"dn3",length:0.1}],
 		repeat:true,
-		keyframe:0
+		keyFrame:0
 	});
 
 	this.leftAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
 		animation:[{spriteName:"lf1",length:0.1},{spriteName:"lf2",length:0.1},{spriteName:"lf3",length:0.1}],
 		repeat:true,
-		keyframe:0
+		keyFrame:0
 	});
 
 	this.rightAnimation = new Animation({
 		spriteSheet:this.spriteSheet,
 		animation:[{spriteName:"rg1",length:0.1},{spriteName:"rg2",length:0.1},{spriteName:"rg3",length:0.1}],
 		repeat:true,
-		keyframe:0
+		keyFrame:0
 	});
 
+	this.sacrificeAnimation = new Animation({
+		spriteSheet:args.sacrificeSS,
+		animation:[{spriteName:"sac1",length:0.1},{spriteName:"sac2",length:0.05},{spriteName:"sac3",length:0.05}],
+		repeat:true,
+		keyframe:0,
+	});
+	this.sacrificeTime = 0.2;
 	
 }
 
 Hero.prototype = new GameObject();
+
+Hero.prototype.startSacrifice = function(){
+	this.isSacrificing = true;
+}
 
 Hero.prototype.moveUp = function(delta){
 	this.setY(Math.max(20,this.getY()-delta*this.getSpeed()));
@@ -78,10 +91,22 @@ Hero.prototype.moveLeft = function(delta){
 
 Hero.prototype.move = function(delta){
 	this.health -= delta*10;
+	if(this.isSacrificing){
+		this.t += delta;
+		this.sacrificeAnimation.update(delta);
+		if(this.t>this.sacrificeTime){
+			this.isSacrificing = false;
+			this.t = 0;
+		}
+	}
 }
 
 Hero.prototype.render = function(ctx){
 	// console.log((this.getPreviousX()-this.getX())+':'+this.getX());
+	if(this.isSacrificing){
+		this.sacrificeAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+		return;
+	}
 	if(this.getPreviousX()>this.getX()){
 		this.leftAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 		this.setX(this.getX());

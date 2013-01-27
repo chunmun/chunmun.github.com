@@ -79,7 +79,8 @@ GameEngine.prototype.init = function(canvas){
                         "sprite/healthbarred.png",
                         "sprite/healthheart 260x130.png",
                         "sprite/bloodburst.png",
-                        "sprite/Bloodaltar.png"
+                        "sprite/Bloodaltar.png",
+                        "sprite/Hero Sacrificing.png",
                         ];    
     imageAssets.forEach(function(path){that.assetManager.queueDownload(path);});
     this.assetManager.downloadAll(function(){});
@@ -396,6 +397,18 @@ GameEngine.prototype.spawnHero = function(){
                          {name:'lf1'},{name:'lf2'},{name:'lf3'},
                          {name:'rg1'},{name:'rg2'},{name:'rg3'}]});
             return hero_ss;
+        })(),
+        sacrificeSS:(function(){
+            var sac_sprite = that.assetManager.getAsset("sprite/Hero Sacrificing.png");
+            var sac_ss = new SpriteSheet({
+                image:sac_sprite,
+                width:200,
+                height:200,
+                cols:3,
+                rows:1,
+                sprites:[{name:'sac1'},{name:'sac2'},{name:'sac3'}]
+            });
+            return sac_ss;
         })()
     };
 
@@ -775,6 +788,7 @@ GameEngine.prototype.__checkTrapActivation = function(){
     if(close_traps[0]){
         close_traps[0].activate();
         h.setHealth(h.getHealth()-close_traps[0].damage);
+        h.startSacrifice();
     }
 }
 
