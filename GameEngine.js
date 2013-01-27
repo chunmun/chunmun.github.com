@@ -44,8 +44,8 @@ function GameEngine(canvas){
     this.__unit_counter = 0;
     this.__debugEnabled = false;
 
-    this.stage1_numbers = 20;
-    this.stage2_numbers = 10;
+    this.stage1_numbers = 79;
+    this.stage2_numbers = 20;
     this.dead = 0;
 
     // this.myTick = this.tick.bind(this);
@@ -147,7 +147,7 @@ GameEngine.prototype.pause = function(){
 GameEngine.prototype.__populateMapWithMonsters = function(){
     var hero_health = Math.floor(this.hero.getHealth());
 
-    if(hero_health < 900 && this.stage1_numbers>0 && Math.random()>0.99){
+    if(hero_health < 1000 && this.stage1_numbers>0 && Math.random()>0.95){
         this.spawnMonsters();
         this.stage1_numbers--;
     }
@@ -916,7 +916,7 @@ GameEngine.prototype.render = function(ctx){
     context.font = 'bold 50px Jokerman';
     context.fillStyle = 'red';
     context.textAlign = 'center';
-    context.fillText(30-this.dead, 580,70);   
+    context.fillText(100-this.dead, 580,70);   
     
     // If we have won or lost, then draw that we have won or lost.
     if(this.gameState === GameEngineStates.WON){
