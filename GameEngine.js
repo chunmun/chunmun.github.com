@@ -301,7 +301,7 @@ GameEngine.prototype.spawnMonsters = function(){
     };
 
     var monster = new Monster(DEFAULT_MONSTER_ARGS);
-    monster.setSpeed(monster.getSpeed()*2*Math.random());
+    monster.setSpeed(monster.getSpeed()*Math.random()+monster.getSpeed());
     that.gameObjects.push(monster);
     monster.deactivate();
     this.monsters.push(monster);
@@ -375,6 +375,7 @@ GameEngine.prototype.spawnHeart = function() {
         spriteSheet:heart_ss,
         animation:[{spriteName:'systole',length:0.1},
                    {spriteName:'diastole',length:0.5}],
+        soundTriggers:["",this.audioManager.getAsset("audio/1beat.wav")],
         repeat:true,
         keyFrame:0
     });
