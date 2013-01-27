@@ -64,6 +64,7 @@ var Animation = function(args){
     this.frame = undefined;
     this.index = 0;
     this.elapsed = 0;
+    this.loopFrame = args.loopFrame || false;
 
     this.repeat = args.repeat || false;
     this.keyFrame = args.keyFrame || 0;
@@ -87,7 +88,11 @@ Animation.prototype.update = function(delta) {
 
     if(this.index >= this.spriteAnimation.length*(1.0/this.speed)){
        if(this.repeat){
-         this.index = this.keyFrame;
+         if(this.loopFrame){    
+             this.index = this.loopFrame;
+         } else {
+             this.index = this.keyFrame;
+         }
        } else {
          this.index--;
        }

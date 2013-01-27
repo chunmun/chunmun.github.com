@@ -29,7 +29,7 @@ function GameEngine(canvas){
     this.assetManager = new AssetManager();
     this.audioManager = new AudioManager();
 
-    this.hero = new Hero(); // TODO need initialisation
+    this.hero; // TODO need initialisation
     this.heart = null;
     this.altar = null;
     this.map = createDefaultMap();
@@ -75,6 +75,7 @@ GameEngine.prototype.init = function(canvas){
                         "sprite/Monster 1 complete Sprite.png",
                         "sprite/Monster 1 Sprite.png",
                         "sprite/Dungeonbg.png",
+                        "sprite/Dungeonbg2.png",
                         "sprite/healthbarred.png",
                         "sprite/healthheart 260x130.png",
                         "sprite/bloodburst.png",
@@ -234,10 +235,11 @@ GameEngine.prototype.spawnAltar = function(){
                 {spriteName:'ba9',length:0.1},
                 {spriteName:'ba10',length:0.1}],
         repeat:true,
-        keyFrame:0
+        keyFrame:0,
+        loopFrame:6
     });
     var altar_obj = new Altar({
-        id : 'trap1', 
+        id : 'trap0', 
         x : 320,
         y : 320,
         speed : 0,
@@ -398,7 +400,7 @@ GameEngine.prototype.spawnHero = function(){
     };
 
     that.hero = new Hero(DEFAULT_HERO_ARGS);
-    that.gameObjects.push(this.hero);
+    that.gameObjects.push(that.hero);
 }
 
 
@@ -521,7 +523,9 @@ GameEngine.prototype.move = function(delta){
     // Check collisions
     this.__checkCollisions();
     //this.__checkCollisionsNaive();
-    this.hero.move(delta);
+    if(this.altar.hasActived){
+        this.hero.move(delta);
+   }
     this.heart.update(delta);
 
     // Move Gore
@@ -893,8 +897,13 @@ GameEngine.prototype.render = function(ctx){
     this.updateUI();
     
     // Fill Background, and CityMap/Roads
-    var bg = this.assetManager.getAsset("sprite/Dungeonbg.png");
-    ctx.drawImage(bg,0,0);
+    if(this.altar.isActive){
+        var bg = this.assetManager.getAsset("sprite/Dungeonbg.png");
+        ctx.drawImage(bg,0,0);
+    } else {
+        var bg2 = this.assetManager.getAsset("sprite/Dungeonbg2.png");
+        ctx.drawImage(bg2,0,0);
+    }
     // ctx.fillStyle = "#AFAFAF";
     // ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -917,8 +926,8 @@ GameEngine.prototype.render = function(ctx){
                 this.traps[i].render(ctx);
             } else {
                 if(dist<MAX_LOS){
-                    this.gameObjects[i].setVisibility((MAX_LOS-dist)/MAX_LOS);
-                    this.gameObjects[i].render(ctx);
+                    this.traps[i].setVisibility((MAX_LOS-dist)/MAX_LOS);
+                    this.traps[i].render(ctx);
                 } else {
                     // Don't render them
                 }
@@ -943,7 +952,9 @@ GameEngine.prototype.render = function(ctx){
     this.heart.setSpeed(speed);
 
     // Draw the hero 
-    this.hero.render(ctx);
+    // if(this.altar.actived){
+        this.hero.render(ctx);
+    // }
     
     // Draw the Gore
     var temp = [];
