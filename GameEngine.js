@@ -261,7 +261,6 @@ GameEngine.prototype.spawnTraps = function(){
 
     console.log(this.traps);
     console.log("Finished spawning traps");
->>>>>>> 48aa025df2d0a5e1c5f6d837bcfbaa111884e528
 }
 
 GameEngine.prototype.spawnHeart = function() {
