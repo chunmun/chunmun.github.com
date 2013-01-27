@@ -3,8 +3,8 @@ var GameEngineStates = {PAUSED:  0,
                         LOST:    2,
                         WON:     4};
 
-var GAME_HEIGHT = 640;
-var GAME_WIDTH = 480;
+var GAME_HEIGHT = 480;
+var GAME_WIDTH = 640;
 
 var MAX_MONSTER_COUNT = 10;
 
