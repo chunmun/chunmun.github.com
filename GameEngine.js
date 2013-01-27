@@ -541,6 +541,10 @@ GameEngine.prototype.move = function(delta){
    }
     this.heart.update(delta);
 
+    if(!(this.altar.hasActived)){
+        this.altar.move(delta,this.hero);
+    }
+
     // Move Gore
     this.gore.forEach(function(blood){blood.gore.update(delta);});
 

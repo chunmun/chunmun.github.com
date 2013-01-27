@@ -448,6 +448,7 @@ Bullet.prototype.render = function(ctx){
 function Altar(args){
     if(!args) return;
 	Trap.call(this,args);
+	this.speed = 50;
     
     this.hasActivated = false;
     this.gameStartCallback = args.altarCallback;
@@ -466,4 +467,19 @@ Altar.prototype.render = function(ctx){
 		this.spriteAnimation.reset();
 	} 
 	this.spriteAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
+}
+
+Altar.prototype.move = function(delta,hero){
+    if(this.getDistanceToUnit(hero)>100 && !this.isActive){
+    	var done = false;
+		var sign = (Math.random()>0.5 ? 1 : -1);
+		var choose_x = (Math.random()*620+10);
+		var choose_y = (Math.random()*460+10);
+	    var dx = choose_x - this.x;
+	    var dy = choose_y - this.y;
+
+	    var theta = Math.atan2(-dy, dx);
+	    this.setMoveAngle(theta);
+	    GameObject.prototype.move.call(this, delta);
+    }
 }
