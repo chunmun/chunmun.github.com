@@ -35,10 +35,10 @@ function updateAICarrot(carrot){
        Path for the carrot to follow.
     */
     
-    if(!carrot.t ||
-       !carrot.path ||
-       !carrot.speed ||
-       !carrot.pt){
+    if(carrot.t === undefined ||
+       carrot.path === undefined ||
+       carrot.speed === undefined ||
+       carrot.pt === undefined){
         throw "Carrot does not have all the variables this method expects it to have! [Path.updateACarrot]";
     }
     

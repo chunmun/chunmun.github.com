@@ -779,6 +779,15 @@ GameEngine.prototype.handlePlayerInput = function(delta){
    if(this.keysPressed[32]){
      this.__checkTrapActivation();
    }
+   
+   console.log("hPI");
+    if((this.gameState === GameEngineStates.WON ||
+        this.gameState === GameEngineStates.LOST) &&
+        this.keysPressed[13]){
+        // When the user presses the Enter key if they've won or lost, reset.
+        GameEngine.call(this);
+        this.init(this.canvas);
+    }
 };
 
 
