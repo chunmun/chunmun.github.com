@@ -57,22 +57,22 @@ function Hero(args){
 Hero.prototype = new GameObject();
 
 Hero.prototype.moveUp = function(delta){
-	this.setY(Math.max(0,this.getY()-delta*this.getSpeed()));
+	this.setY(Math.max(20,this.getY()-delta*this.getSpeed()));
 	this.upAnimation.update(delta);
 }
 
 Hero.prototype.moveDown = function(delta){
-	this.setY(Math.min(GAME_HEIGHT,this.getY()+delta*this.getSpeed()));
+	this.setY(Math.min(GAME_HEIGHT-240,this.getY()+delta*this.getSpeed()));
 	this.downAnimation.update(delta);
 }
 
 Hero.prototype.moveRight = function(delta){
-	this.setX(Math.max(0,this.getX()+delta*this.getSpeed()));
+	this.setX(Math.min(GAME_WIDTH+80,this.getX()+delta*this.getSpeed()));
 	this.rightAnimation.update(delta);
 }
 
 Hero.prototype.moveLeft = function(delta){
-	this.setX(Math.min(GAME_WIDTH,this.getX()-delta*this.getSpeed()));
+	this.setX(Math.max(20,this.getX()-delta*this.getSpeed()));
 	this.leftAnimation.update(delta);
 }
 

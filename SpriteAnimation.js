@@ -30,6 +30,8 @@ SpriteSheet.prototype.load = function(data){
     this._cols = data.cols || 200;
     this._rows = data.rows || 1;
 };
+
+
  
 SpriteSheet.prototype.getOffset = function(spriteName) {
     //Go through all sprites to find the required one
@@ -72,6 +74,7 @@ Animation.prototype.reset = function() {
     this.elapsed = 0;
     this.index = this.keyFrame;
     this.frame = this.spriteAnimation[this.index];
+    this.speed = 1;
 };
 
 Animation.prototype.update = function(delta) {
@@ -82,7 +85,7 @@ Animation.prototype.update = function(delta) {
         this.elapsed = Math.max(0,this.elapsed - this.frame.length);
     }
 
-    if(this.index >= this.spriteAnimation.length){
+    if(this.index >= this.spriteAnimation.length*(1.0/this.speed)){
        if(this.repeat){
          this.index = this.keyFrame;
        } else {
@@ -97,9 +100,16 @@ Animation.prototype.getIndex = function(){
     return this.index;
 }
 
+Animation.prototype.setSpeed = function(speed){
+   this.speed = speed; 
+}
+
 Animation.prototype.render = function(ctx,x,y,scale,visibility){
     var info = this.spriteSheet.getOffset(this.frame.spriteName);
     ctx.globalAlpha = visibility;
+    console.log("HERE");
+    console.log(info);
+    console.log(x,y);
     ctx.drawImage(info.image,info.x,info.y,info.width,info.height,x,y,info.width*scale,info.height*scale);
     ctx.globalAlpha = 1;
 }

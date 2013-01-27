@@ -23,10 +23,14 @@ function GameEngine(canvas){
     this.gamePaused = true;
     this.gameState = GameEngineStates.PAUSED;
 
+    this.gamet = 0;
+    this.gameBeatInterval = 15;
+
     this.assetManager = new AssetManager();
     // TODO need map initialisation
 
     this.hero = new Hero(); // TODO need initialisation
+    this.heart = null;
     this.map = createDefaultMap();
     this.monsters = [];
     this.traps = [];
@@ -63,14 +67,18 @@ GameEngine.prototype.init = function(canvas){
     this.assetManager.queueDownload("sprite/trap3 600x200.png"); // TODO load real assets
     this.assetManager.queueDownload("sprite/hero.png");
 	this.assetManager.queueDownload("sprite/Monster 1 complete Sprite.png");
+	this.assetManager.queueDownload("sprite/Monster 1 Sprite.png");
+    this.assetManager.queueDownload("sprite/Dungeonbg.png");
+    this.assetManager.queueDownload("sprite/healthbarred.png");
+    this.assetManager.queueDownload("sprite/healthheart 260x130.png");
     this.assetManager.downloadAll(function(){});
 
     // add the traps
     this.spawnTraps();
     this.spawnHero();
     this.spawnMonsters();
+    this.spawnHeart();
 };
-
 
 
 GameEngine.prototype.setCanvas = function(c){
@@ -222,24 +230,39 @@ GameEngine.prototype.spawnTraps = function(){
     });
 
     var trap = new Trap({
-       id : 'trap1',
-       x : GAME_WIDTH/2,
-       y : GAME_HEIGHT/2,
-       speed : 0,
-       max_speed : 0,
-       visibility : 1,
-       damage : 10,
-       prevX : GAME_WIDTH/2,
-       prevY : GAME_HEIGHT/2,
-       scale : 0.2,
-       animation : trap_animation
+        id : 'trap1',
+        x : GAME_WIDTH/2,
+        y : GAME_HEIGHT/2,
+        speed : 0,
+        max_speed : 1,
+        visibility : 1,
+        damage : 10,
+        prevX : GAME_WIDTH/2,
+        prevY : GAME_HEIGHT/2,
+        scale : 0.2,
+        animation : trap_animation
     });
     trap.deactivate();
-    this.gameObjects.push(trap);
     this.traps.push(trap);
-    console.log(this.traps);
-    console.log("Finished spawning traps");
+    this.gameObjects.push(trap);
 }
+
+GameEngine.prototype.spawnHeart = function() {
+    var heart_sprite = this.assetManager.getAsset("sprite/healthheart 260x130.png");
+    var heart_ss = new SpriteSheet({
+        image:heart_sprite,
+        width:130,
+        height:130,
+        sprites:[{name:'systole',x:0, y:0},{name:'diastole'}]});
+    var heart_animation = new Animation({
+        spriteSheet:heart_ss,
+        animation:[{spriteName:'systole',length:0.1},
+                   {spriteName:'diastole',length:0.5}],
+        repeat:true,
+        keyFrame:0
+    });
+    this.heart = heart_animation;
+};
 
 
 GameEngine.prototype.spawnHero = function(){
@@ -249,6 +272,7 @@ GameEngine.prototype.spawnHero = function(){
         x:GAME_WIDTH/2, 
         y:GAME_HEIGHT/2, 
         visibility:1, 
+
         damage:0, 
         scale:0.3, 
         spriteSheet:(function(){
@@ -306,6 +330,7 @@ GameEngine.prototype.tick = function tick(){
         this.renderDebugCanvas(this.debugContext);
     }
     
+    this.gamet += 1;
     //Call function again
     // if(!this.gamePaused){
     //     window.setTimeout(this.myTick, 10, time);
@@ -326,6 +351,7 @@ GameEngine.prototype.__checkGameTerminationConditions = function(){
     // The game is lost if the hero has no more health 
     if(this.hero.getHealth() <= 0){
         this.gameState = GameEngineStates.LOST;
+        this.timer.stop();
     }
 };
 
@@ -388,6 +414,7 @@ GameEngine.prototype.move = function(delta){
     this.__checkCollisions();
     //this.__checkCollisionsNaive();
     this.hero.move(delta);
+    this.heart.update(delta);
 };
 
 
@@ -742,7 +769,6 @@ GameEngine.prototype.updateUI = function(){
 
 
 
-
 /*
  Render objects to canvas' context.
 */
@@ -750,8 +776,11 @@ GameEngine.prototype.render = function(ctx){
     this.updateUI();
     
     // Fill Background, and CityMap/Roads
-    ctx.fillStyle = "#AFAFAF";
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    var bg = this.assetManager.getAsset("sprite/Dungeonbg.png");
+    ctx.drawImage(bg,0,0);
+    // ctx.fillStyle = "#AFAFAF";
+    // ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
     //this.cityMap.render(ctx);
     this.map.renderMapPathData(ctx);
      
@@ -778,6 +807,17 @@ GameEngine.prototype.render = function(ctx){
         this.monsters[i].render(ctx);
     }
 
+    // Draw the health bar
+    var hp_bar = this.assetManager.getAsset("sprite/healthbarred.png");
+    var change = 420*(1000-this.hero.getHealth())/1000;
+    ctx.drawImage(hp_bar,2,20+change,20,420-change);
+
+
+    // Draw the heart
+    this.heart.render(ctx,0,Math.min(400,change+20),0.2,1);
+    var speed = 2-this.hero.getHealth()/1000;
+    this.heart.setSpeed(speed);
+    console.log(speed);
 
     // Draw the hero 
     this.hero.render(ctx);
@@ -921,9 +961,13 @@ function Timer(){
     this.gameTime = 0;
     this.maxStep = MAX_DELTA;
     this.wallLastTimestamp = 0;
+    this.stopped = false;
 }
 
 Timer.prototype.tick = function(){
+    if(this.stopped){
+        return 0;
+    }
     var wallCurrent = Date.now();
     var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
 
@@ -931,4 +975,8 @@ Timer.prototype.tick = function(){
     this.gameTime += gameDelta;
     this.wallLastTimestamp = wallCurrent;
     return gameDelta;
+}
+
+Timer.prototype.stop = function(){
+    this.stopped = true;
 }
