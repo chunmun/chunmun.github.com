@@ -44,6 +44,10 @@ function GameEngine(canvas){
     this.__unit_counter = 0;
     this.__debugEnabled = false;
 
+    this.stage1_numbers = 20;
+    this.stage2_numbers = 10;
+    this.dead = 0;
+
     // this.myTick = this.tick.bind(this);
     this.timer = new Timer();
 }
@@ -141,10 +145,18 @@ GameEngine.prototype.pause = function(){
 */
 
 GameEngine.prototype.__populateMapWithMonsters = function(){
-    if (((Math.floor(this.hero.getHealth()) == 666) ||
-        (Math.floor(this.hero.getHealth()) == 333)) && (this.monsters.length <= MAX_MONSTER_COUNT)) {
+    var hero_health = Math.floor(this.hero.getHealth());
+
+    if(hero_health < 900 && this.stage1_numbers>0 && Math.random()>0.99){
         this.spawnMonsters();
+        this.stage1_numbers--;
     }
+
+    if(hero_health < 400 && this.stage2_numbers>0){
+        this.spawnMonsters();
+        this.stage2_numbers--;
+    }
+ 
                 // while(this.monsters.length < MAX_MONSTER_COUNT){
                 //     // Spawn a monster somewhere random on the map.
                 //     var id = "monster" + ("000" + this.__unit_counter).slice(-3);
@@ -262,7 +274,7 @@ GameEngine.prototype.spawnTraps = function(){
                 speed : 0,
                 max_speed : 0,
                 visibility : 1,
-                damage : 10,
+                damage : 20,
                 prevX : GAME_WIDTH/2,
                 prevY : GAME_HEIGHT/2,
                 scale : 0.2,
@@ -436,6 +448,7 @@ GameEngine.prototype.move = function(delta){
     });
     expiredMonsters.forEach(function(monster){
         this.removeObject(monster);
+        this.dead++;
         removeFromList(monster, this.monsters);
     }.bind(this));
 
@@ -497,7 +510,7 @@ GameEngine.prototype.__checkCollisions = function(){
             var yVal = arr[i].y-arr[j].y;
             var yValSq = yVal*yVal;
             var dist = xValSq + yValSq;
-            if (dist < 500){
+            if (dist < 600){
                 this.handleCollision(arr[i], arr[j]);
             }
         }
@@ -899,6 +912,11 @@ GameEngine.prototype.render = function(ctx){
         context.fillText("FPS:" + frameRateStr, 5, 15);
     }
     
+    // Render the number of monsters left
+    context.font = 'bold 50px Jokerman';
+    context.fillStyle = 'red';
+    context.textAlign = 'center';
+    context.fillText(30-this.dead, 580,70);   
     
     // If we have won or lost, then draw that we have won or lost.
     if(this.gameState === GameEngineStates.WON){
