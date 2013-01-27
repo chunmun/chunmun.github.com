@@ -107,9 +107,6 @@ Animation.prototype.setSpeed = function(speed){
 Animation.prototype.render = function(ctx,x,y,scale,visibility){
     var info = this.spriteSheet.getOffset(this.frame.spriteName);
     ctx.globalAlpha = visibility;
-    console.log("HERE");
-    console.log(info);
-    console.log(x,y);
     ctx.drawImage(info.image,info.x,info.y,info.width,info.height,x,y,info.width*scale,info.height*scale);
     ctx.globalAlpha = 1;
 }

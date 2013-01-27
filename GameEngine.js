@@ -215,21 +215,6 @@ GameEngine.prototype.spawnMonsters = function(){
 GameEngine.prototype.spawnTraps = function(){
     console.log('Spawning Traps');
     var that = this;
-    var trap_sprite = that.assetManager.getAsset("sprite/trap3 600x200.png");
-    var trap_ss = new SpriteSheet({
-        image:trap_sprite,
-        width:200,
-        height:200,
-        sprites:[{name:'neutral',x:0, y:0},{name:'reset'},{name:'ready'}]});
-    var trap_animation = new Animation({
-        spriteSheet:trap_ss,
-        animation:[{spriteName:'neutral',length:0.1},
-                   {spriteName:'reset',length:0.1},
-                   {spriteName:'ready',length:0.5}],
-        repeat:true,
-        keyFrame:0
-    });
-
     var MAX_AMT_TRAPS = 3;
     var maxAmtTrapsSq = MAX_AMT_TRAPS*MAX_AMT_TRAPS;
     var scaleX = Math.floor(600/MAX_AMT_TRAPS);
@@ -237,6 +222,20 @@ GameEngine.prototype.spawnTraps = function(){
 
     for (var i = 0; i < MAX_AMT_TRAPS; i++){
         for (var j = 0; j < MAX_AMT_TRAPS; j++){
+            var trap_sprite = that.assetManager.getAsset("sprite/trap3 600x200.png");
+            var trap_ss = new SpriteSheet({
+                image:trap_sprite,
+                width:200,
+                height:200,
+                sprites:[{name:'neutral',x:0, y:0},{name:'reset'},{name:'ready'}]});
+            var trap_animation = new Animation({
+                spriteSheet:trap_ss,
+                animation:[{spriteName:'neutral',length:0.1},
+                           {spriteName:'reset',length:0.1},
+                           {spriteName:'ready',length:0.5}],
+                repeat:true,
+                keyFrame:0
+            });
             var randomX = Math.floor((Math.random()+i)*scaleX);
             var randomY = Math.floor((Math.random()+j)*scaleY);
 
@@ -807,6 +806,7 @@ GameEngine.prototype.render = function(ctx){
             var dist = this.hero.getDistanceToUnit(this.traps[i]);
             if(this.traps[i].isActive){
                 this.traps[i].render(ctx);
+                console.log(this.traps[i].spriteAnimation.getIndex());
             } else {
                 if(dist<MAX_LOS){
                     this.gameObjects[i].setVisibility((MAX_LOS-dist)/MAX_LOS);
@@ -833,7 +833,6 @@ GameEngine.prototype.render = function(ctx){
     this.heart.render(ctx,0,Math.min(400,change+20),0.2,1);
     var speed = 2-this.hero.getHealth()/1000;
     this.heart.setSpeed(speed);
-    console.log(speed);
 
     // Draw the hero 
     this.hero.render(ctx);
