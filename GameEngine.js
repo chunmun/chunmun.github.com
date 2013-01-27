@@ -31,9 +31,7 @@ function GameEngine(canvas){
 
     this.hero = new Hero(); // TODO need initialisation
     this.heart = null;
-    this.altar = new Altar({x: 320,
-                            y: 240,
-                            altarCallback: this.altarSacrificed});
+    this.altar = new Altar();
     this.map = createDefaultMap();
     this.monsters = [];
     this.traps = [];
@@ -53,7 +51,6 @@ function GameEngine(canvas){
     // this.myTick = this.tick.bind(this);
     this.timer = new Timer();
 }
-
 
 
 /*
@@ -80,7 +77,8 @@ GameEngine.prototype.init = function(canvas){
                         "sprite/Dungeonbg.png",
                         "sprite/healthbarred.png",
                         "sprite/healthheart 260x130.png",
-                        "sprite/bloodburst.png"
+                        "sprite/bloodburst.png",
+                        "sprite/Bloodaltar.png"
                         ];    
     imageAssets.forEach(function(path){that.assetManager.queueDownload(path);});
     this.assetManager.downloadAll(function(){});
@@ -94,6 +92,7 @@ GameEngine.prototype.init = function(canvas){
     this.spawnTraps();
     this.spawnHero();
     this.spawnHeart();
+    this.spawnAltar();
 };
 
 
@@ -201,6 +200,55 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
                 
                 // this.__updateFocusComboBox();
 };
+
+
+
+GameEngine.prototype.spawnAltar = function(){
+    var altarSprite = this.assetManager.getAsset("Bloodaltar.png");
+    var altar_ss = new SpriteSheet({
+        image:altarSprite,
+        width:200,
+        height:200,
+        sprites:[{name:'ba1'},
+                {name:'ba2'},
+                {name:'ba3'},
+                {name:'ba4'},
+                {name:'ba5'},
+                {name:'ba6'},
+                {name:'ba7'},
+                {name:'ba8'},
+                {name:'ba9'},
+                {name:'ba10'}]});
+    var altar_animation = new Animation({
+        spriteSheet:altar_ss,
+        animation:[{spriteName:'ba2',length:0.1},
+                {spriteName:'ba3',length:0.1},
+                {spriteName:'ba4',length:0.1},
+                {spriteName:'ba5',length:0.1},
+                {spriteName:'ba6',length:0.1},
+                {spriteName:'ba7',length:0.1},
+                {spriteName:'ba8',length:0.1},
+                {spriteName:'ba9',length:0.1},
+                {spriteName:'ba10',length:0.1}],
+        repeat:true,
+        keyFrame:0
+    });
+    var altar_obj = new Altar({
+        id : 'trap1', 
+        x : 320,
+        y : 240,
+        speed : 0,
+        max_speed : 0,
+        visibility : 1,
+        damage : 20,
+        prevX : GAME_WIDTH/2,
+        prevY : GAME_HEIGHT/2,
+        scale : 0.2,
+        animation : altar_animation,
+        altarCallback: this.altarSacrificed
+    });
+    this.altar = altar_obj;
+}
 
 //Hans
 GameEngine.prototype.spawnMonsters = function(){
