@@ -48,6 +48,9 @@ function GameEngine(canvas){
     this.stage2_numbers = 20;
     this.dead = 0;
 
+    this.squish_aud = new Audio();
+    this.squish_aud.src = "audio/squish.wav";
+
     // this.myTick = this.tick.bind(this);
     this.timer = new Timer();
 }
@@ -643,8 +646,6 @@ GameEngine.prototype.__checkCollisionsNaive = function(){
 
 
 GameEngine.prototype.handleCollision = function(obj1, obj2){
-    var aud = new Audio();
-    aud.src = "audio/squish.wav";
    // Resolve collision between Hero, Monster and traps
    // Monster damages HERO
    if(obj1 instanceof Monster){
@@ -658,7 +659,8 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
            this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
            this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
            this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
-           aud.play();
+           this.quish_aud.currentTime = 0;
+           this.squish_aud.play();
         }
      }else{
         // Monster-Hero
@@ -672,7 +674,8 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
            this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
            this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
            this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
-           aud.play();
+           this.squish_aud.currentTime = 0;
+           this.squish_aud.play();
        }
      }else if(obj2 instanceof Trap){
         // Trap-Trap
