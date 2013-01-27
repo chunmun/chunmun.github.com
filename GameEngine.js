@@ -9,7 +9,7 @@ var GAME_WIDTH = 640;
 var MAX_MONSTER_COUNT = 10;
 
 var MAX_DELTA = 0.5;
-var DEBUG_SHOW_FRAMERATE = true;
+var DEBUG_SHOW_FRAMERATE = !true;
 
 /**
 * An object to look after game animation/movement.
