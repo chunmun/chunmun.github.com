@@ -211,6 +211,7 @@ GameEngine.prototype.spawnMonsters = function(){
     console.log("Finished spawning monster");
 }
 
+
 GameEngine.prototype.spawnTraps = function(){
     console.log('Spawning Traps');
     var that = this;
@@ -229,22 +230,38 @@ GameEngine.prototype.spawnTraps = function(){
         keyFrame:0
     });
 
-    var trap = new Trap({
-        id : 'trap1',
-        x : GAME_WIDTH/2,
-        y : GAME_HEIGHT/2,
-        speed : 0,
-        max_speed : 1,
-        visibility : 1,
-        damage : 10,
-        prevX : GAME_WIDTH/2,
-        prevY : GAME_HEIGHT/2,
-        scale : 0.2,
-        animation : trap_animation
-    });
-    trap.deactivate();
-    this.traps.push(trap);
-    this.gameObjects.push(trap);
+    var MAX_AMT_TRAPS = 3;
+    var maxAmtTrapsSq = MAX_AMT_TRAPS*MAX_AMT_TRAPS;
+    var scaleX = Math.floor(600/MAX_AMT_TRAPS);
+    var scaleY = Math.floor(440/MAX_AMT_TRAPS);
+
+    for (var i = 0; i < MAX_AMT_TRAPS; i++){
+        for (var j = 0; j < MAX_AMT_TRAPS; j++){
+            var randomX = Math.floor((Math.random()+i)*scaleX);
+            var randomY = Math.floor((Math.random()+j)*scaleY);
+
+            var trap = new Trap({
+                id : 'trap1', 
+                x : randomX,
+                y : randomY,
+                speed : 0,
+                max_speed : 0,
+                visibility : 1,
+                damage : 10,
+                prevX : GAME_WIDTH/2,
+                prevY : GAME_HEIGHT/2,
+                scale : 0.2,
+                animation : trap_animation
+            });
+            trap.deactivate();
+            this.gameObjects.push(trap);
+            this.traps.push(trap);
+        }
+    }
+
+    console.log(this.traps);
+    console.log("Finished spawning traps");
+>>>>>>> 48aa025df2d0a5e1c5f6d837bcfbaa111884e528
 }
 
 GameEngine.prototype.spawnHeart = function() {
