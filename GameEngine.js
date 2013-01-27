@@ -28,10 +28,12 @@ function GameEngine(canvas){
 
     this.assetManager = new AssetManager();
     this.audioManager = new AudioManager();
-    // TODO need map initialisation
 
     this.hero = new Hero(); // TODO need initialisation
     this.heart = null;
+    this.altar = new Altar({x: 320,
+                            y: 240,
+                            altarCallback: this.altarSacrificed});
     this.map = createDefaultMap();
     this.monsters = [];
     this.traps = [];
@@ -91,9 +93,16 @@ GameEngine.prototype.init = function(canvas){
     // add the traps
     this.spawnTraps();
     this.spawnHero();
-    this.spawnMonsters();
     this.spawnHeart();
 };
+
+
+
+GameEngine.prototype.altarSacrificed = function(){
+    // Let the games begin!
+    this.spawnMonsters();
+}
+
 
 
 GameEngine.prototype.setCanvas = function(c){
