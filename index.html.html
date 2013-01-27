@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+		<!-- Game Dependencies -->
+        <script src="AssetManager.js" ></script>
+        <script src="SpriteAnimation.js" ></script>
+        <script src="Geometry.js" ></script>
+        <script src="GameObject.js" ></script>
+        <script src="GameUnits.js" > </script>
+        <script src="SFX.js" ></script>
+        <script src="Map.js" ></script>
+        <script src="Pathfinding.js" ></script>
+        <script src="GameEngine.js" ></script>
+        <script>
+            var GE; //Game engine Global variable
+            
+            window.onload = function() {
+	        // Create a new GameEngine tied to a specific HTML5 Canvas.
+                canvas = document.getElementById("gameCanvas");
+                context = canvas.getContext("2d");
+ 
+                GE = new GameEngine(canvas);
+                GE.init(canvas);
+                GE.newGame();
+                GE.start();
+            };
+        </script>
+    </head>
+    
+    <body>
+        <table width="100%">
+            <tr>
+                <td colspan="2" align="center"><h3>GGJ2013-Deborah</h3></td>
+            </tr>
+			
+            <tr>
+                <td width="650" valign="top" align="center" colspan="2">
+                    <!-- Game canvas -->
+                    <canvas id="gameCanvas" width="640" height="480" tabindex="1"></canvas>
+                </td>
+                
+				
+				
+				
+				
+				
+			</tr>
+            <tr>	
+                <td valign="top" rowspan="2">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <!-- Control buttons -->
+                    <input type="button" value="New Game" onclick="GE.newGame();GE.start()" />
+                    <input type="button" value="Pause Game" onclick="GE.pause()" />
+                    <input type="button" value="Resume Game" onclick="GE.start()" />
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
