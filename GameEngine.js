@@ -87,7 +87,10 @@ GameEngine.prototype.init = function(canvas){
     this.assetManager.downloadAll(function(){});
 
     // load the audio assets
-    var audioAssets = ["audio/bgsound.wav"];
+    var audioAssets = ["audio/bgsound.wav",
+                       "audio/Clamp_metalping.wav",
+                       "audio/1beat.wav",
+                       "audio/loseblood.wav"];
     audioAssets.forEach(function(path){that.audioManager.queueDownload(path);});
     this.audioManager.downloadAll(function(){});
 
@@ -298,11 +301,10 @@ GameEngine.prototype.spawnMonsters = function(){
     };
 
     var monster = new Monster(DEFAULT_MONSTER_ARGS);
+    monster.setSpeed(monster.getSpeed()*2*Math.random());
     that.gameObjects.push(monster);
     monster.deactivate();
     this.monsters.push(monster);
-    console.log(this.monsters);
-    console.log("Finished spawning monster");
 }
 
 
@@ -316,6 +318,9 @@ GameEngine.prototype.spawnTraps = function(){
 
     for (var i = 0; i < MAX_AMT_TRAPS; i++){
         for (var j = 0; j < MAX_AMT_TRAPS; j++){
+            var aud = new Audio();
+            aud.volume = 0.5;
+            aud.src = "audio/Clamp_metalping.wav";
             var trap_sprite = that.assetManager.getAsset("sprite/trap3 600x200.png");
             var trap_ss = new SpriteSheet({
                 image:trap_sprite,
@@ -328,7 +333,8 @@ GameEngine.prototype.spawnTraps = function(){
                            {spriteName:'reset',length:0.1},
                            {spriteName:'ready',length:0.5}],
                 repeat:true,
-                keyFrame:0
+                keyFrame:0,
+                soundTriggers: ["", aud ,""]
             });
             var randomX = Math.floor((Math.random()+i)*scaleX);
             var randomY = Math.floor((Math.random()+j)*scaleY);
@@ -344,7 +350,7 @@ GameEngine.prototype.spawnTraps = function(){
                 prevX : GAME_WIDTH/2,
                 prevY : GAME_HEIGHT/2,
                 scale : 0.2,
-                animation : trap_animation
+                animation : trap_animation,
             });
             trap.deactivate();
             this.gameObjects.push(trap);
@@ -636,6 +642,8 @@ GameEngine.prototype.__checkCollisionsNaive = function(){
 
 
 GameEngine.prototype.handleCollision = function(obj1, obj2){
+    var aud = new Audio();
+    aud.src = "audio/squish.wav";
    // Resolve collision between Hero, Monster and traps
    // Monster damages HERO
    if(obj1 instanceof Monster){
@@ -649,6 +657,7 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
            this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
            this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
            this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
+           aud.play();
         }
      }else{
         // Monster-Hero
@@ -662,6 +671,7 @@ GameEngine.prototype.handleCollision = function(obj1, obj2){
            this.spawnGoreAnimation(obj2.getX(),obj2.getY(),1);
            this.spawnGoreAnimation(obj2.getX()+Math.random()*15,obj2.getY()+Math.random()*15,1);
            this.spawnGoreAnimation(obj2.getX()-Math.random()*30,obj2.getY()+Math.random()*30,1);
+           aud.play();
        }
      }else if(obj2 instanceof Trap){
         // Trap-Trap
@@ -792,6 +802,9 @@ GameEngine.prototype.__checkTrapActivation = function(){
     if(close_traps[0]){
         close_traps[0].activate();
         h.setHealth(h.getHealth()-close_traps[0].damage);
+        var aud = new Audio();
+        aud.src = "audio/loseblood.wav";
+        aud.play();
         h.startSacrifice();
     }
 }
@@ -1191,4 +1204,18 @@ GameEngine.prototype.startBGM = function(){
     var bgm = this.audioManager.getAsset("audio/bgsound.wav");
     bgm.loop = true;
     bgm.play();
+}
+
+
+
+function copydeeply(obj){
+    if(obj instanceof Object){
+        var copy = {};
+        for (var attr in obj){
+            if(obj.hasOwnProperty(attr)){
+                copy[attr] = clone(obj[attr]);
+            }
+        }
+        return copy;
+    }
 }

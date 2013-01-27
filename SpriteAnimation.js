@@ -68,6 +68,8 @@ var Animation = function(args){
 
     this.repeat = args.repeat || false;
     this.keyFrame = args.keyFrame || 0;
+
+    this.soundTriggers = args.soundTriggers || [];
     this.reset();
 }
 
@@ -114,4 +116,9 @@ Animation.prototype.render = function(ctx,x,y,scale,visibility){
     ctx.globalAlpha = visibility;
     ctx.drawImage(info.image,info.x,info.y,info.width,info.height,x,y,info.width*scale,info.height*scale);
     ctx.globalAlpha = 1;
+    var ind = this.index;
+        // console.log("THIS "+ind);
+    if(this.soundTriggers[this.index] instanceof Audio){
+        this.soundTriggers[this.index].play();
+    }
 }
