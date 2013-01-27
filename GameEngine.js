@@ -31,7 +31,7 @@ function GameEngine(canvas){
 
     this.hero = new Hero(); // TODO need initialisation
     this.heart = null;
-    this.altar = new Altar();
+    this.altar = null;
     this.map = createDefaultMap();
     this.monsters = [];
     this.traps = [];
@@ -204,6 +204,7 @@ GameEngine.prototype.__populateMapWithMonsters = function(){
 
 
 GameEngine.prototype.spawnAltar = function(){
+    var that = this;
     var altarSprite = this.assetManager.getAsset("Bloodaltar.png");
     var altar_ss = new SpriteSheet({
         image:altarSprite,
@@ -894,6 +895,8 @@ GameEngine.prototype.render = function(ctx){
     // ctx.fillStyle = "#AFAFAF";
     // ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+    this.altar.render(ctx);
+    
     //this.cityMap.render(ctx);
     //////////////////////////////////////////////////////////////////////////                                TO SHOW PATH
     //this.map.renderMapPathData(ctx);

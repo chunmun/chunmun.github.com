@@ -421,14 +421,24 @@ Bullet.prototype.render = function(ctx){
 
 
 function Altar(args){
+    if(!args) return;
+	Trap.call(this,args);
+    
     this.hasActivated = false;
-    this.x = args.x;
-    this.y = args.y;
     this.gameStartCallback = args.altarCallback;
 }
 Altar.prototype = new Trap();
 
 Altar.prototype.activate = function(){
     this.hasActived = true;
+    this.isActive = true;
     this.gameStartCallback();
+}
+
+Altar.prototype.render = function(ctx){
+	if(!this.isActive){
+		// Trap has not been activated by player
+		this.spriteAnimation.reset();
+	} 
+	this.spriteAnimation.render(ctx,this.x,this.y,this.scale,this.visibility);
 }
